@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} {{page_name}} {% endblock %}
+
+{% block content %}
+h2 Test project for abz.agency
+
+
+
+table.table.table-striped.table-dark
+	thead
+		tr
+			for table_name in ["id", "Name", "Work Position", "Chief"]
+				th(scope="col") #{table_name}}
+	tbody
+		{% for employee in workers %}
+		tr
+			th(scope="row") {{ employee.id }}
+			td {{ employee.name }}
+			td {{ employee.work_position }}
+			td 
+				|{% if employee.chief %}
+				|	{{ employee.chief }}
+				|{% else %} - {% endif %}
+			//td {{ employee.date_join }}
+			//td {{ employee.wage }}
+		{% endfor %}
+{% endblock content %}
+
+{% block right_panel %}
+h4 Its a right panel. Registration, signed or more.
+{% endblock right_panel %}
