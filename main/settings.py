@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Installed packages
-    'django_seed',
 
     #Create apps
     'manager_employee',
