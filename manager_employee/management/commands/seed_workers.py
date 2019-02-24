@@ -11,13 +11,23 @@ class Command(BaseCommand):
     help = "Filling employee base with random values"
 
     def handle(self, *args, **options):
+        """ Adds workers with random names to the database
+
+        To populate the database, run: 
+        >>> python manage.py seed_workers -w 10 20 30 40 50
+
+        Thus, in the first hierarchy there will be 10 users.
+        In the second hierarchy - 20.
+        And so on until five
+        """
 
         workers_previous_hierarchy = []
-        list_workers = self._current_list(options['workers'])
+        list_workers = self._normalized_list(options['workers'])
         
         for hierarchy in range(5):
-            
+
             _workers_created = []
+
             for i in range(list_workers[hierarchy]):
                 new_employee = Employee.objects.create(**self.random_dict_employee(workers_previous_hierarchy))
                 _workers_created.append(new_employee)
@@ -33,7 +43,8 @@ class Command(BaseCommand):
 
 
     def random_dict_employee(self, chief_model_list=[]):
-        
+        """ Returns a dictionary with random values ​​to fill in the Employee model. """
+
         faker = Faker('uk_UA')
         random_object = random.choice(chief_model_list) if chief_model_list else None
 
@@ -46,6 +57,8 @@ class Command(BaseCommand):
 
 
     def add_arguments(self, parser):
+        """ Run command with arguments [-w / --workers] [1 2 3 4 5] """
+
         parser.add_argument(
             '-w',
             '--workers',
@@ -56,7 +69,9 @@ class Command(BaseCommand):
         )
 
 
-    def _current_list(self, cur_list, recurs=False):
+    def _normalized_list(self, cur_list, recurs=False):
+        """ Lists arguments in normalized form. """
+
         result_str = ''
         result_list = []
         default_list = [1, 2, 3, 4, 5]
@@ -66,7 +81,7 @@ class Command(BaseCommand):
                 result_str += str(element)
                 continue
             else:
-                result_list.extend(self._current_list(element, recurs=True))
+                result_list.extend(self._normalized_list(element, recurs=True))
 
         try:
             result_list.append(int(result_str))
