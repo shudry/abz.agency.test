@@ -7,14 +7,10 @@
 <table class="table table-striped table-dark">
   <thead>
     <tr>
-      <th scope="col">id</th>
-      <th scope="col">Name</th>
-      <th scope="col">Work Position</th>
-      <!--th(scope="col") Name-->
-      <!--th(scope="col") Work Position-->
-      <!--th(scope="col") Date Join-->
-      <!--th(scope="col") Wage-->
-      <!--th(scope="col") Chief-->
+      <th scope="col">id}</th>
+      <th scope="col">Name}</th>
+      <th scope="col">Work Position}</th>
+      <th scope="col">Chief}</th>
     </tr>
   </thead>
   <tbody>{% for employee in workers %}
@@ -25,7 +21,7 @@
       <td>
          
         {% if employee.chief %}
-        	{{ employee.chief }}
+          {{ employee.chief }}
         {% else %} - {% endif %}
       </td>
       <!--td {{ employee.date_join }}-->
