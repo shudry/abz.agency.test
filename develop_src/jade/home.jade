@@ -6,26 +6,13 @@
 {% block content %}
 h2 Test project for abz.agency
 
+.container-workers
+    .header.row
+        for table_name in ["Img", "Name", "Work Position", "Chief"]
+            .col-md-3 
+                p #{table_name}
 
 
-table.table.table-striped.table-dark
-    thead
-        tr
-            for table_name in ["id", "Name", "Work Position", "Chief"]
-                th(scope="col") #{table_name}}
-    tbody
-        {% for employee in workers %}
-        tr
-            th(scope="row") {{ employee.id }}
-            td {{ employee.name }}
-            td {{ employee.work_position }}
-            td 
-                |{% if employee.chief %}
-                |   {{ employee.chief }}
-                |{% else %} - {% endif %}
-            //td {{ employee.date_join }}
-            //td {{ employee.wage }}
-        {% endfor %}
 {% endblock content %}
 
 {% block right_panel %}

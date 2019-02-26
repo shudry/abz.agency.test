@@ -4,6 +4,8 @@ class AJAXWorkersManager
 
     shownFirstWorkersId = []
 
+    constructor: (@container) ->
+
     getWorkersBoss: (bossId, count) ->
         ### Get subordinates boss
         
@@ -38,8 +40,26 @@ class AJAXWorkersManager
 
     AJAXsuccessGetWorkers: (data, textStatus, jqXHR) ->
         #success request AJAX
-        shownFirstWorkersId.push element.id for element in data
 
+        frn = (element) ->
+            shownFirstWorkersId.push element.id
+            html = """
+                <div class="employee row">
+                <div class="col-md-3"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
+                <div class="col-md-3">
+                  <p>#{element.name}</p>
+                </div>
+                <div class="col-md-3">
+                  <p>#{element.work_position}</p>
+                </div>
+                <div class="col-md-3">
+                  <p>#{element.chief}</p>
+                </div>
+                </div>
+            """   
+            $('.container-workers').append(html)
+
+        frn element for element in data
 
     AJAXerrorGetWorkers: (jqXHR, textStatus, errorThrown) ->
         #error request AJAX
@@ -64,6 +84,6 @@ class AJAXWorkersManager
 
 
 $(document).ready ->
-    me2 = new AJAXWorkersManager
+    me2 = new AJAXWorkersManager ".container-workers"
     
     me2.showFirstHierarchy()

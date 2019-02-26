@@ -1,10 +1,25 @@
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:400,500&subset=cyrillic');
 
-*
-	font-family: 'Ubuntu', sans-serif;
+workers-header-bg = #2b3340
+workers-content-bg = #4F586C
+workers-border-color = #384354
 
-body
-	//background-color: #21222A;
-	
-h1
-	//color: #fff; 
+
+.img-circle
+    border-radius: 50%
+
+.container-workers > .header
+    background-color: workers-header-bg
+    color: white
+    
+.container-workers > .employee
+    background-color: workers-content-bg
+    border-top: 1px solid workers-border-color
+    
+    img
+        margin-top: 5px
+        margin-bottom: 5px
+        
+    p
+        margin-top: 5px
+        color: white

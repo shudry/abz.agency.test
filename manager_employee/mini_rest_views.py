@@ -21,7 +21,7 @@ class WorkersManager(View):
 			workers = Employee.objects.filter(chief__id=int(boss))\
 				.exclude(id__in=unnecessary_id)[:count]
 
-		return JsonResponse(list(workers.values('id', 'work_position', 'chief')), safe=False)
+		return JsonResponse(list(workers.values('id','name', 'work_position', 'chief')), safe=False)
 
 
 	def post(self, request):
