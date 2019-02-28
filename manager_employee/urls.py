@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import MainPage
+from .views import MainPage, AuthenticateUser
 
 urlpatterns = [
-	path('', MainPage.as_view(), name='main_page'),
+    path('login/', AuthenticateUser.as_view()),
+    path('', MainPage.as_view(), name='main_page'),
 ]
