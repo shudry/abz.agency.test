@@ -45,6 +45,7 @@ class AJAXWorkersManager
 
     appendElementToDOM = (element) ->
         shownFirstWorkersId[element.id] = {}
+        element_chief = if element.chief then element.chief else ''
         html = """
             <div class="employee" id="employee-id-#{element.id}">
                 <div class="row">
@@ -56,7 +57,7 @@ class AJAXWorkersManager
                       <p>#{element.work_position}</p>
                     </div>
                     <div class="col-md-3">
-                      <p>#{element.chief}</p>
+                      <p>#{element_chief}</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +88,8 @@ class AJAXWorkersManager
 
 $(document).ready ->
     me2 = new AJAXWorkersManager
-    me2.showFirstHierarchy(10)
+    
+    me2.showFirstHierarchy()
     me2.showListWorkers()
 
     me2.showWorkersSecondHierarchy()

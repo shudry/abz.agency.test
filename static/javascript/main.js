@@ -63,9 +63,10 @@
     };
 
     appendElementToDOM = function(element) {
-      var html;
+      var element_chief, html;
       shownFirstWorkersId[element.id] = {};
-      return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-3\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n        <div class=\"col-md-3\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.chief + "</p>\n        </div>\n    </div>\n</div>";
+      element_chief = element.chief ? element.chief : '';
+      return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-3\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n        <div class=\"col-md-3\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element_chief + "</p>\n        </div>\n    </div>\n</div>";
     };
 
     AJAXWorkersManager.prototype.showFirstHierarchy = function(count) {
@@ -107,7 +108,7 @@
   $(document).ready(function() {
     var me2;
     me2 = new AJAXWorkersManager;
-    me2.showFirstHierarchy(10);
+    me2.showFirstHierarchy();
     me2.showListWorkers();
     return me2.showWorkersSecondHierarchy();
   });
