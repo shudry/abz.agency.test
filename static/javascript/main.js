@@ -5,13 +5,11 @@
   $ = jQuery;
 
   AJAXWorkersManager = (function() {
-    var shownFirstWorkersId;
+    var appendElementToDOM, shownFirstWorkersId;
 
-    shownFirstWorkersId = [];
+    function AJAXWorkersManager() {}
 
-    function AJAXWorkersManager(container) {
-      this.container = container;
-    }
+    shownFirstWorkersId = {};
 
     AJAXWorkersManager.prototype.getWorkersBoss = function(bossId, count) {
 
@@ -32,36 +30,42 @@
         data: {
           boss: bossId,
           count: count,
-          unnecessaryId: encodeURI(shownFirstWorkersId.join())
+          unnecessaryId: encodeURI(Object.keys(shownFirstWorkersId).join())
         },
         async: false
       });
       if (bossId === "first-hierarchy") {
-        request.done(this.AJAXsuccessGetWorkers);
-        return request.fail(this.AJAXerrorGetWorkers);
+        request.done(function(data, textStatus, jqXHR) {
+          var element, i, len, results;
+          results = [];
+          for (i = 0, len = data.length; i < len; i++) {
+            element = data[i];
+            results.push($('.container-workers').append(appendElementToDOM(element)));
+          }
+          return results;
+        });
       } else {
-
+        request.done(function(data, textStatus, jqXHR) {
+          var element, i, len, results;
+          results = [];
+          for (i = 0, len = data.length; i < len; i++) {
+            element = data[i];
+            results.push($("#employee-id-" + element.chief).append(appendElementToDOM(element)));
+          }
+          return results;
+        });
       }
-    };
-
-    AJAXWorkersManager.prototype.AJAXsuccessGetWorkers = function(data, textStatus, jqXHR) {
-      var element, frn, i, len, results;
-      frn = function(element) {
-        var html;
-        shownFirstWorkersId.push(element.id);
-        html = "<div class=\"employee row\">\n<div class=\"col-md-3\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n<div class=\"col-md-3\">\n  <p>" + element.name + "</p>\n</div>\n<div class=\"col-md-3\">\n  <p>" + element.work_position + "</p>\n</div>\n<div class=\"col-md-3\">\n  <p>" + element.chief + "</p>\n</div>\n</div>";
-        return $('.container-workers').append(html);
-      };
-      results = [];
-      for (i = 0, len = data.length; i < len; i++) {
-        element = data[i];
-        results.push(frn(element));
-      }
-      return results;
+      return request.fail(this.AJAXerrorGetWorkers);
     };
 
     AJAXWorkersManager.prototype.AJAXerrorGetWorkers = function(jqXHR, textStatus, errorThrown) {
       return console.log("Error: " + jqXHR + ", " + textStatus + ", " + errorThrown);
+    };
+
+    appendElementToDOM = function(element) {
+      var html;
+      shownFirstWorkersId[element.id] = {};
+      return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-3\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n        <div class=\"col-md-3\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.chief + "</p>\n        </div>\n    </div>\n</div>";
     };
 
     AJAXWorkersManager.prototype.showFirstHierarchy = function(count) {
@@ -76,12 +80,23 @@
       return this.getWorkersBoss("first-hierarchy", count);
     };
 
-    AJAXWorkersManager.prototype.showWorkersInTree = function(parentEmployeeContainer) {
+    AJAXWorkersManager.prototype.showWorkersSecondHierarchy = function(count) {
+      var employee, i, len, ref, results;
+      if (count == null) {
+        count = 100;
+      }
 
       /* Show 2 and more hierarchy workers */
+      ref = Object.keys(shownFirstWorkersId);
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        employee = ref[i];
+        results.push(this.getWorkersBoss(employee, count));
+      }
+      return results;
     };
 
-    AJAXWorkersManager.prototype.getShownedListId = function() {
+    AJAXWorkersManager.prototype.showListWorkers = function() {
       return console.log(shownFirstWorkersId);
     };
 
@@ -91,8 +106,10 @@
 
   $(document).ready(function() {
     var me2;
-    me2 = new AJAXWorkersManager(".container-workers");
-    return me2.showFirstHierarchy();
+    me2 = new AJAXWorkersManager;
+    me2.showFirstHierarchy(10);
+    me2.showListWorkers();
+    return me2.showWorkersSecondHierarchy();
   });
 
 }).call(this);

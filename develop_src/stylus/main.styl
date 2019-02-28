@@ -1,25 +1,48 @@
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:400,500&subset=cyrillic');
 
 workers-header-bg = #2b3340
-workers-content-bg = #4F586C
-workers-border-color = #384354
+
+//First hierarchy
+first-workers-content-bg = #4F586C
+first-workers-border-color = #384354
+
+//Second hierarchy
+second-workers-content-bg = #3E4555
+second-workers-border-color = #384354
 
 
 .img-circle
     border-radius: 50%
-
-.container-workers > .header
-    background-color: workers-header-bg
-    color: white
     
-.container-workers > .employee
-    background-color: workers-content-bg
-    border-top: 1px solid workers-border-color
-    
-    img
-        margin-top: 5px
-        margin-bottom: 5px
-        
-    p
-        margin-top: 5px
+.container-workers
+    > .header
+        background-color: workers-header-bg
         color: white
+        
+    .employee    
+        img
+            margin-top: 5px
+            margin-bottom: 5px
+            
+        p
+            margin-top: 5px
+            color: white
+
+    
+    //First hierarchy
+    > .employee        
+        > .row
+            background-color: first-workers-content-bg
+            border-top: 1px solid first-workers-border-color
+        
+        > div:nth-child(2) > div
+            box-shadow: inset 0 8px 8px #222
+
+        //Second hierarchy
+        > .employee
+            margin-left: 40px
+
+            > .row
+                background-color: second-workers-content-bg
+                border-top: 1px solid second-workers-border-color
+        

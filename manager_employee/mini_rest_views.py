@@ -7,7 +7,7 @@ from .models import Employee
 class WorkersManager(View):
 
 	def get(self, request):
-		boss = str(request.GET.get('boss', ''))
+		boss = str(request.GET.get('boss', 0))
 		count = int(request.GET.get('count', 0))
 		un_id_get = request.GET.get('unnecessaryId', '')
 		
@@ -18,7 +18,7 @@ class WorkersManager(View):
 			workers = Employee.objects.filter(chief=None)\
 				.exclude(id__in=unnecessary_id)[:count]
 		else:
-			workers = Employee.objects.filter(chief__id=int(boss))\
+			workers = Employee.objects.filter(chief_id=int(boss))\
 				.exclude(id__in=unnecessary_id)[:count]
 
 		return JsonResponse(list(workers.values('id','name', 'work_position', 'chief')), safe=False)

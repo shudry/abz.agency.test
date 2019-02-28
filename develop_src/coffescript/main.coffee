@@ -2,9 +2,7 @@ $ = jQuery
 
 class AJAXWorkersManager
 
-    shownFirstWorkersId = []
-
-    constructor: (@container) ->
+    shownFirstWorkersId = {}
 
     getWorkersBoss: (bossId, count) ->
         ### Get subordinates boss
@@ -27,44 +25,42 @@ class AJAXWorkersManager
             data: 
                 boss: bossId
                 count: count
-                unnecessaryId: encodeURI(shownFirstWorkersId.join())
+                unnecessaryId: encodeURI(Object.keys(shownFirstWorkersId).join())
             async: false
         
         if bossId == "first-hierarchy"
-            request.done @AJAXsuccessGetWorkers
-            request.fail @AJAXerrorGetWorkers
+            request.done (data, textStatus, jqXHR) ->
+                $('.container-workers').append(appendElementToDOM element) for element in data
         else
-            #request.done @AJAXsuccessGetWorkers
-            #request.fail @AJAXerrorGetWorkers
+            request.done (data, textStatus, jqXHR) ->
+                $("#employee-id-#{element.chief}").append(appendElementToDOM element) for element in data
+        
+        request.fail @AJAXerrorGetWorkers
 
-
-    AJAXsuccessGetWorkers: (data, textStatus, jqXHR) ->
-        #success request AJAX
-
-        frn = (element) ->
-            shownFirstWorkersId.push element.id
-            html = """
-                <div class="employee row">
-                <div class="col-md-3"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
-                <div class="col-md-3">
-                  <p>#{element.name}</p>
-                </div>
-                <div class="col-md-3">
-                  <p>#{element.work_position}</p>
-                </div>
-                <div class="col-md-3">
-                  <p>#{element.chief}</p>
-                </div>
-                </div>
-            """   
-            $('.container-workers').append(html)
-
-        frn element for element in data
 
     AJAXerrorGetWorkers: (jqXHR, textStatus, errorThrown) ->
         #error request AJAX
         console.log "Error: #{jqXHR}, #{textStatus}, #{errorThrown}"
 
+
+    appendElementToDOM = (element) ->
+        shownFirstWorkersId[element.id] = {}
+        html = """
+            <div class="employee" id="employee-id-#{element.id}">
+                <div class="row">
+                    <div class="col-md-3"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
+                    <div class="col-md-3">
+                      <p>#{element.name}</p>
+                    </div>
+                    <div class="col-md-3">
+                      <p>#{element.work_position}</p>
+                    </div>
+                    <div class="col-md-3">
+                      <p>#{element.chief}</p>
+                    </div>
+                </div>
+            </div>
+        """
 
     showFirstHierarchy: (count=100) ->
         ### Display list first hierarchy 
@@ -74,16 +70,24 @@ class AJAXWorkersManager
 
         @getWorkersBoss "first-hierarchy", count
 
-    showWorkersInTree: (parentEmployeeContainer) ->
+
+    showWorkersSecondHierarchy: (count=100) ->
         ### Show 2 and more hierarchy workers ###
 
-    getShownedListId: () ->
+        for employee in Object.keys(shownFirstWorkersId)
+            #console.log "employee-id-#{employee}"
+            @getWorkersBoss employee, count
+
+
+    showListWorkers: () ->
         console.log shownFirstWorkersId
 
 
 
 
 $(document).ready ->
-    me2 = new AJAXWorkersManager ".container-workers"
-    
-    me2.showFirstHierarchy()
+    me2 = new AJAXWorkersManager
+    me2.showFirstHierarchy(10)
+    me2.showListWorkers()
+
+    me2.showWorkersSecondHierarchy()
