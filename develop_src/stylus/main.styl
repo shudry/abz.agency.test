@@ -13,6 +13,7 @@ second-workers-border-color = #384354
 
 body
     background: #E8EAEF
+    padding-bottom: 50px
 
     *
         font-family: 'Ubuntu', sans-serif
@@ -20,7 +21,7 @@ body
 .about-project
     padding-bottom: 20px
     h2
-        margin: 15px
+        margin: 25px 0
     a
         color: #358
         text-decoration: underline
@@ -58,7 +59,7 @@ body
             border-top: 1px solid first-workers-border-color
         
         > div:nth-child(2) > div
-            box-shadow: inset 0 8px 8px #222
+            box-shadow: inset 0 7px 5px #333
 
         //Second hierarchy
         > .employee
@@ -67,6 +68,23 @@ body
             > .row
                 background-color: second-workers-content-bg
                 border-top: 1px solid second-workers-border-color
+                
+.load-more-workers
+	margin: 25px 0 25px 0
+	background-color: workers-header-bg
+	color: white
+	border: none
+	border-radius: 0px
+	
+	&:visited, &:link, &:active, &:focus
+		color: white
+		box-shadow: none
+		border: none
+
+	&:hover
+		color: #888
+		cursor: pointer
+		background-color: second-workers-content-bg
         
 
 .is-authenticated-block

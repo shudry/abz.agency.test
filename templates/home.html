@@ -27,6 +27,9 @@
       <p>Chief</p>
     </div>
   </div>
+</div>
+<div class="row justify-content-md-center">
+  <div class="col-md-auto"><a href="#load-more" class="load-more-workers btn btn-default">Загрузити ще ...</a></div>
 </div>{% endblock content %}
 {% block right_panel %}
 {% if request.user.is_authenticated %}
@@ -34,7 +37,7 @@
   <div class="col-lg-2"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
   <div class="col-lg-7">{% if request.user.is_superuser %}
     <h5 class="name">{{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})</h5>
-    <p>Authenticated superuser.</p>{% endif %}
+    <p>Адміністратор</p>{% endif %}
   </div>
   <div class="col-lg-3"></div>
 </div>{% else %}

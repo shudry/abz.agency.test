@@ -18,6 +18,10 @@
             .col-md-3 
                 p #{table_name}
 
+.row.justify-content-md-center
+    .col-md-auto
+        a.load-more-workers.btn.btn-default(href="#load-more") Загрузити ще ...
+
 
 {% endblock content %}
 
@@ -29,7 +33,7 @@
     .col-lg-7
         {% if request.user.is_superuser %}
         h5.name {{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})
-        p Authenticated superuser.
+        p Адміністратор
         {% endif %}
     .col-lg-3
 {% else %}

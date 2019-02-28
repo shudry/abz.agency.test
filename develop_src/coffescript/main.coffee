@@ -5,19 +5,7 @@ class AJAXWorkersManager
     shownFirstWorkersId = {}
 
     getWorkersBoss: (bossId, count) ->
-        ### Get subordinates boss
-        
-        bossId: Id user.
-            If bossId = "first-hierarchy" show users who are not have boss.
-        
-        count: Count list workers.
-
-        listUnnecessaryId: Already get and show workers.
-            No need to re-receive.
-        ###
-
-        #shownFirstWorkersId.push 20
-        #console.log shownFirstWorkersId
+        ### Get subordinates boss ###
 
         request = $.ajax 
             url: "/workers/"
@@ -30,10 +18,23 @@ class AJAXWorkersManager
         
         if bossId == "first-hierarchy"
             request.done (data, textStatus, jqXHR) ->
-                $('.container-workers').append(appendElementToDOM element) for element in data
+
+                # If all employees are loaded from the database, hide the “load more” button
+                # For only first hierarchy
+                if data.length == 0 or data.length < count
+                    $('.load-more-workers').css
+                        display: 'none'
+
+                for element in data
+                    if not shownFirstWorkersId[element.id]
+                        shownFirstWorkersId[element.id] = {}
+                        $('.container-workers').append(appendElementToDOM element)
         else
             request.done (data, textStatus, jqXHR) ->
-                $("#employee-id-#{element.chief}").append(appendElementToDOM element) for element in data
+                for element in data
+                    if not shownFirstWorkersId[element.chief][element.id]
+                        shownFirstWorkersId[element.chief][element.id] = element
+                        $("#employee-id-#{element.chief}").append(appendElementToDOM element)
         
         request.fail @AJAXerrorGetWorkers
 
@@ -44,7 +45,6 @@ class AJAXWorkersManager
 
 
     appendElementToDOM = (element) ->
-        shownFirstWorkersId[element.id] = {}
         element_chief = if element.chief then element.chief else ''
         html = """
             <div class="employee" id="employee-id-#{element.id}">
@@ -63,21 +63,14 @@ class AJAXWorkersManager
             </div>
         """
 
-    showFirstHierarchy: (count=100) ->
-        ### Display list first hierarchy 
-
-        count: Get count users
-        ###
-
+    showFirstHierarchy: (count=50) ->
+        ### Display list first hierarchy ###
         @getWorkersBoss "first-hierarchy", count
 
 
-    showWorkersSecondHierarchy: (count=100) ->
-        ### Show 2 and more hierarchy workers ###
-
-        for employee in Object.keys(shownFirstWorkersId)
-            #console.log "employee-id-#{employee}"
-            @getWorkersBoss employee, count
+    showWorkersSecondHierarchy: (count=50) ->
+        ### Show 2 hierarchy workers ###
+        @getWorkersBoss "second-hierarchy", count
 
 
     showListWorkers: () ->
@@ -89,7 +82,11 @@ class AJAXWorkersManager
 $(document).ready ->
     me2 = new AJAXWorkersManager
     
-    me2.showFirstHierarchy()
+    me2.showFirstHierarchy(40)
     me2.showListWorkers()
 
     me2.showWorkersSecondHierarchy()
+
+    $(".load-more-workers").click () ->
+        me2.showFirstHierarchy(40)
+        me2.showWorkersSecondHierarchy()

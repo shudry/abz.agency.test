@@ -17,6 +17,8 @@ class WorkersManager(View):
 		if boss == 'first-hierarchy':
 			workers = Employee.objects.filter(chief=None)\
 				.exclude(id__in=unnecessary_id)[:count]
+		elif boss == 'second-hierarchy':
+			workers = Employee.objects.filter(chief_id__in=unnecessary_id)
 		else:
 			workers = Employee.objects.filter(chief_id=int(boss))\
 				.exclude(id__in=unnecessary_id)[:count]
