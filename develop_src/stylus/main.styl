@@ -1,10 +1,108 @@
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:400,500&subset=cyrillic');
 
-*
-	font-family: 'Ubuntu', sans-serif;
+workers-header-bg = #2b3340
+
+//First hierarchy
+first-workers-content-bg = #4F586C
+first-workers-border-color = #384354
+
+//Second hierarchy
+second-workers-content-bg = #3E4555
+second-workers-border-color = #384354
+
 
 body
-	//background-color: #21222A;
+    background: #E8EAEF
+    padding-bottom: 50px
+
+    *
+        font-family: 'Ubuntu', sans-serif
+
+.about-project
+    padding-bottom: 20px
+    h2
+        margin: 25px 0
+    a
+        color: #358
+        text-decoration: underline
+    a:hover
+        color: #236
+        text-decoration: none
+            
+
+
+.img-circle
+    border-radius: 50%
+    
+.container-workers
+    > .header
+        background-color: workers-header-bg
+        color: white
+        
+        p
+            margin-top: 15px
+        
+    .employee    
+        img
+            margin-top: 5px
+            margin-bottom: 5px
+            
+        p
+            margin-top: 17px
+            color: white
+
+    
+    //First hierarchy
+    > .employee:not(.load-more-empl)    
+        > .row
+            background-color: first-workers-content-bg
+            border-top: 1px solid first-workers-border-color
+        
+        > div:nth-child(2) > div
+            box-shadow: inset 0 7px 5px #333
+
+        //Second hierarchy
+        > .employee
+            margin-left: 40px
+
+            > .row
+                background-color: second-workers-content-bg
+                border-top: 1px solid second-workers-border-color
+                
+.employee-load-more-link
+	margin: 25px 0 25px 0
+	background-color: workers-header-bg
+	color: white
+	border: none
+	border-radius: 0px
 	
-h1
-	//color: #fff; 
+	&:visited, &:link, &:active, &:focus
+		color: white
+		box-shadow: none
+		border: none
+
+	&:hover
+		color: #888
+		cursor: pointer
+		background-color: second-workers-content-bg
+        
+
+.is-authenticated-block
+    background-color: workers-header-bg
+    padding: 10px 0 10px 0
+    margin: 25px 0 25px 10px
+
+    img
+        margin: 15px 0 15px 0
+
+    p
+        color: white
+        font-size: 12px
+
+    h5.name
+        color: white
+        margin-top: 12px
+
+.signed-block
+    padding: 10px 0 10px 0
+    margin: 25px 0 25px 10px

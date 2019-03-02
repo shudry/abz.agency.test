@@ -4,30 +4,36 @@
 {% block title %} {{page_name}} {% endblock %}
 
 {% block content %}
-h2 Test project for abz.agency
+.about-project
+    h2 Тестовий проект для abz.agency 
+    ul
+        li
+            p GitHub - 
+                a(href="https://github.com/shudry/shudry-test-project") https://github.com/shudry/shudry-test-project
+    p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus est praesentium illum corporis dolor soluta non laudantium sequi modi commodi quo numquam, doloremque, tempora officia inventore repellat recusandae voluptatibus. Distinctio. 
+
+.container-workers
+    .header.row
+        for table_name in ["", "Name", "Work Position", "Id"]
+            .col-md-3 
+                p #{table_name}
 
 
-
-table.table.table-striped.table-dark
-    thead
-        tr
-            for table_name in ["id", "Name", "Work Position", "Chief"]
-                th(scope="col") #{table_name}}
-    tbody
-        {% for employee in workers %}
-        tr
-            th(scope="row") {{ employee.id }}
-            td {{ employee.name }}
-            td {{ employee.work_position }}
-            td 
-                |{% if employee.chief %}
-                |   {{ employee.chief }}
-                |{% else %} - {% endif %}
-            //td {{ employee.date_join }}
-            //td {{ employee.wage }}
-        {% endfor %}
 {% endblock content %}
 
 {% block right_panel %}
-h4 Its a right panel. Registration, signed or more.
+{% if request.user.is_authenticated %}
+.is-authenticated-block.row
+    .col-lg-2
+        img(src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50").img-circle
+    .col-lg-7
+        {% if request.user.is_superuser %}
+        h5.name {{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})
+        p Адміністратор
+        {% endif %}
+    .col-lg-3
+{% else %}
+.signed-block.row
+    h5 Блок для входу, реєстрації тощо.
+{% endif %}
 {% endblock right_panel %}
