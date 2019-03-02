@@ -24,7 +24,7 @@ $ virtualenv --no-site-packages -p python3.5 .virtual && source .virtual/bin/act
 
 ## Налаштування проекту:
 ```bash
-$ git clone https://github.com/shudry/shudry-test-project.git && cd shudry-test-project
+$ git clone https://github.com/shudry/abz.agency.test.git && cd abz.agency.test
 $ pip install -r requirements.txt 
 ```
 

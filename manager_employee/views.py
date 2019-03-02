@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import EmployeeSerializer
+from .serializers import EmployeeSerializer, EmployeeSerializerIsAuthenticated
 from .models import Employee
 # Create your views here.
 
@@ -54,7 +54,6 @@ class AuthenticateUser(View):
 
 class RestEmployee(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
 
     @action(detail=True, methods=['get'])
     def subordinates(self, request, pk=None):
@@ -81,3 +80,8 @@ class RestEmployee(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(recent_employees, many=True)
         return Response(serializer.data)
+
+    def get_serializer_class(self):
+    	if self.request.user.is_authenticated:
+    		return EmployeeSerializerIsAuthenticated
+    	return EmployeeSerializer

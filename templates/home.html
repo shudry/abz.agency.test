@@ -7,13 +7,29 @@
   <h2>Тестовий проект для abz.agency </h2>
   <ul>
     <li>
-      <p>GitHub - <a href="https://github.com/shudry/shudry-test-project">https://github.com/shudry/shudry-test-project</a></p>
+      <p>GitHub - <a href="https://github.com/shudry/abz.agency.test">https://github.com/shudry/abz.agency.test</a></p>
     </li>
   </ul>
   <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus est praesentium illum corporis dolor soluta non laudantium sequi modi commodi quo numquam, doloremque, tempora officia inventore repellat recusandae voluptatibus. Distinctio. </p>
 </div>
 <div class="container-workers">
-  <div class="header row">
+  <div class="header row">{% if request.user.is_authenticated %}
+    <div class="col-md-1"></div>
+    <div class="col-md-4">
+      <p>Name</p>
+    </div>
+    <div class="col-md-2">
+      <p>Work Position</p>
+    </div>
+    <div class="col-md-2">
+      <p>Wage</p>
+    </div>
+    <div class="col-md-2">
+      <p>Date Join</p>
+    </div>
+    <div class="col-md-1">
+      <p>Id</p>
+    </div>{% else %}
     <div class="col-md-3"> 
       <p></p>
     </div>
@@ -25,7 +41,7 @@
     </div>
     <div class="col-md-3"> 
       <p>Id</p>
-    </div>
+    </div>{% endif %}
   </div>
 </div>{% endblock content %}
 {% block right_panel %}
@@ -37,6 +53,18 @@
     <p>Адміністратор</p>{% endif %}
   </div>
   <div class="col-lg-3"></div>
+</div>
+<div class="form-group right_panel_form">
+  <label for="search-name">Пошук за назвою ( name1 | name2 | ... )</label>
+  <input type="text" placeholder="Пошук" id="search-name" class="form-control"/>
+  <select class="custom-select">
+    <option selected="selected">Сортувати ...</option>
+    <option value="1">За алфавітом</option>
+    <option value="2">Спочатку новіші</option>
+    <option value="3">Спочатку старіші</option>
+    <option value="4">Спочатку найбільша зарплата</option>
+    <option value="5">Спочатку найменша зарплата</option>
+  </select>
 </div>{% else %}
 <div class="signed-block row">
   <h5>Блок для входу, реєстрації тощо.</h5>

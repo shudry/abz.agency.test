@@ -30,7 +30,7 @@
 
     appendElementToDOM = function(element) {
       var html;
-      return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-3\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n        <div class=\"col-md-3\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.id + "</p>\n        </div>\n    </div>\n</div>";
+      return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-1\"><img src=\"https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4\" alt=\"Logo\" width=\"50\" height=\"50\" class=\"img-circle\"/></div>\n        <div class=\"col-md-4\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-2\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-2\">\n          <p>" + element.wage + "</p>\n        </div>\n        <div class=\"col-md-2\">\n          <p>" + element.date_join + "</p>\n        </div>\n        <div class=\"col-md-1\">\n          <p>" + element.id + "</p>\n        </div>\n    </div>\n</div>";
     };
 
     appendElementLoadMore = function(element_chief) {
