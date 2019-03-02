@@ -1,9 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from .views import *
 
-from .views import MainPage
-from .mini_rest_views import WorkersManager
+from rest_framework import routers
+
+router = routers.SimpleRouter()
+router.register(r'employee', RestEmployee)
 
 urlpatterns = [
-	path('workers/', WorkersManager.as_view(), name='rest_workers'),
-	path('', MainPage.as_view(), name='main_page'),
+    path('login/', AuthenticateUser.as_view()),    
+    path('', MainPage.as_view(), name='main_page'),
 ]
+
+urlpatterns += router.urls

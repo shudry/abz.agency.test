@@ -14,13 +14,9 @@
 
 .container-workers
     .header.row
-        for table_name in ["", "Name", "Work Position", "Chief"]
+        for table_name in ["", "Name", "Work Position", "Id"]
             .col-md-3 
                 p #{table_name}
-
-.row.justify-content-md-center
-    .col-md-auto
-        a.load-more-workers.btn.btn-default(href="#load-more") Загрузити ще ...
 
 
 {% endblock content %}

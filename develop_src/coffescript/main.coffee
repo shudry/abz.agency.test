@@ -1,71 +1,25 @@
 $ = jQuery
 
-class AJAXWorkersManager
+class AJAXEmployeesManager
 
     shownFirstWorkersId = {}
 
-    getWorkersBoss = (bossId, count, unnecessaryList) ->
-        ### Get subordinates boss ###
+    constructor: (@firstCount, @secondCount) ->
 
-        unnecesList = if unnecessaryList then unnecessaryList else shownFirstWorkersId
-
+    getEmployee: (url, requestDone) ->
         request = $.ajax 
-            url: "/workers/"
+            url: url
             type: "GET"
-            data: 
-                boss: bossId
-                count: count
-                unnecessaryId: encodeURI(Object.keys(unnecesList).join())
-            async: false
-        
-        if bossId == "first-hierarchy"
-            request.done (data, textStatus, jqXHR) ->
 
-                # If all employees are loaded from the database, hide the “load more” button
-                # For only first hierarchy
-                if data.length == 0 or data.length < count
-                    $('.load-more-workers').remove()
-
-                for element in data
-                    if not shownFirstWorkersId[element.id]
-                        shownFirstWorkersId[element.id] = {}
-                        $('.container-workers').append(appendElementToDOM element)
-        
-        else
-            request.done (data, textStatus, jqXHR) ->
-
-                exist_show_more = []
-
-                if data.length == 0 or data.length < count
-                    $("#employee-load-more-#{e.target.id}").remove()
-
-                for element in data
-                    if Object.keys(shownFirstWorkersId[element.chief]).length >= count
-
-                        if element.chief in exist_show_more
-                            continue
-
-                        result_code = $("#employee-id-#{element.chief}").append(appendElementLoadMore element.chief)
-                        result_code.find("a").click (e) ->
-                            getWorkersBoss e.target.id, count, shownFirstWorkersId[e.target.id]
-                            $("#employee-load-more-#{e.target.id}").remove()
-
-                        exist_show_more.push element.chief
-                        continue
-
-                    if not shownFirstWorkersId[element.chief][element.id]
-                        shownFirstWorkersId[element.chief][element.id] = element
-                        $("#employee-id-#{element.chief}").append(appendElementToDOM element)
-        
         request.fail @AJAXerrorGetWorkers
-
+        request.done requestDone
 
     AJAXerrorGetWorkers: (jqXHR, textStatus, errorThrown) ->
         #error request AJAX
         console.log "Error: #{jqXHR}, #{textStatus}, #{errorThrown}"
 
+
     appendElementToDOM = (element) ->
-        element_chief = if element.chief then element.chief else ''
         html = """
             <div class="employee" id="employee-id-#{element.id}">
                 <div class="row">
@@ -77,7 +31,7 @@ class AJAXWorkersManager
                       <p>#{element.work_position}</p>
                     </div>
                     <div class="col-md-3">
-                      <p>#{element_chief}</p>
+                      <p>#{element.id}</p>
                     </div>
                 </div>
             </div>
@@ -85,7 +39,7 @@ class AJAXWorkersManager
 
     appendElementLoadMore = (element_chief) ->
         html = """
-            <div class="employee" id="employee-load-more-#{element_chief}">
+            <div class="employee load-more-empl" id="employee-load-more-#{element_chief}">
                 <div class="row justify-content-md-center">
                     <div class="col-md-auto">
                         <a href="#load-more" class="employee-load-more-link btn btn-default" id="#{element_chief}">Загрузити ще ...</a>
@@ -95,15 +49,59 @@ class AJAXWorkersManager
         """
 
 
-    showFirstHierarchy: (count=50) ->
-        ### Display list first hierarchy ###
-        getWorkersBoss "first-hierarchy", count
+    showFirstHierarchy: (count, urlNext) ->
+        url = urlNext or "/employee/withoutchief/?limit=#{count}"
+        thisContext = this
+
+        @getEmployee url, (data, textStatus, jqXHR) ->
+            if data.results or data.count > 0 or not data.next
+                $("#employee-load-more-first-loads").remove()
+
+            for element in data.results
+                if not shownFirstWorkersId[element.id]
+                    shownFirstWorkersId[element.id] = {
+                        self: element,
+                        subordinates: {}
+                    }
+                    $(".container-workers").append(appendElementToDOM element)
+                    
+                    #Initialization show subordinates(second hierarchy)
+                    thisContext.showSecondHierarchy element.id, null, thisContext.secondCount                
+
+            if data.next
+                $(".container-workers").append(appendElementLoadMore "first-loads")
+                $("#employee-load-more-first-loads").find("a").click (e) ->
+                    thisContext.showFirstHierarchy count, data.next
 
 
-    showWorkersSecondHierarchy: (count=50) ->
-        ### Show 2 hierarchy workers ###
-        getWorkersBoss "second-hierarchy", count
+    showSecondHierarchy: (elementID, urlNext, count) ->
+        url = urlNext or "/employee/#{elementID}/subordinates/?limit=#{count}"
+        thisContext = this
 
+        @getEmployee url, (data, textStatus, jqXHR) ->
+            if data.results or data.count > 0 or not data.next
+                $("#employee-load-more-#{elementID}").remove()
+            
+            # Append employees to chief
+            for employee in data.results
+                if not shownFirstWorkersId[employee.chief].subordinates[employee.id]
+                    shownFirstWorkersId[employee.chief].subordinates[employee.id] = employee
+                    $("#employee-id-#{employee.chief}").append(appendElementToDOM employee)
+            
+            if data.next
+                $("#employee-id-#{elementID}").append(appendElementLoadMore elementID)
+                $("#employee-load-more-#{elementID}").find("a").click (e) ->
+                    thisContext.showSecondHierarchy e.target.id, data.next, thisContext.secondCount
+
+
+
+    showEmployees: () ->
+        @showFirstHierarchy @firstCount
+
+    #showSecond: () ->
+    #    for element in Object.keys(shownFirstWorkersId)
+    #        if not shownFirstWorkersId[element].isAlreadyInitialize
+    #            @showSecondHierarchy element, @secondCount
 
     showListWorkers: () ->
         console.log shownFirstWorkersId
@@ -112,12 +110,6 @@ class AJAXWorkersManager
 
 
 $(document).ready ->
-    me2 = new AJAXWorkersManager
+    me2 = new AJAXEmployeesManager 40, 10
     
-    me2.showFirstHierarchy(40)
-    #me2.showListWorkers()
-    me2.showWorkersSecondHierarchy(1)
-
-    $(".load-more-workers").click () ->
-        me2.showFirstHierarchy(40)
-        #me2.showWorkersSecondHierarchy(2)
+    me2.showEmployees()

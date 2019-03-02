@@ -53,7 +53,7 @@ body
 
     
     //First hierarchy
-    > .employee        
+    > .employee:not(.load-more-empl)    
         > .row
             background-color: first-workers-content-bg
             border-top: 1px solid first-workers-border-color
@@ -69,7 +69,7 @@ body
                 background-color: second-workers-content-bg
                 border-top: 1px solid second-workers-border-color
                 
-.load-more-workers, .employee-load-more-link
+.employee-load-more-link
 	margin: 25px 0 25px 0
 	background-color: workers-header-bg
 	color: white
