@@ -11,7 +11,7 @@
 <div class="container-workers">
   <div class="header row">{% if request.user.is_authenticated %}
     <div class="col-md-1"></div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <p>Name</p>
     </div>
     <div class="col-md-2">
@@ -23,7 +23,7 @@
     <div class="col-md-2">
       <p>Date Join</p>
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
       <p>Id</p>
     </div>{% else %}
     <div class="col-md-3"> 
@@ -39,6 +39,16 @@
       <p>Id</p>
     </div>{% endif %}
   </div>
+  <div id="not-found-employees-warning" class="employee load-more-empl">
+    <div class="row justify-content-md-center">
+      <div class="col-lg-8 col-md-10">
+        <div role="alert" class="row alert alert-warning text-center"> 
+          <div class="col-md-1"><i class="fas fa-exclamation fa-2x"></i></div>
+          <div class="col-md-11">Не знайдено жодного працівника. Будь ласка, заповніть базу робітниками або виконайте:<br/><b>./manage.py seed_workers -w ...</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>{% endblock content %}
 {% block right_panel %}
 {% if request.user.is_authenticated %}
@@ -51,8 +61,8 @@
   <div class="col-lg-3 block-icon-logout"><a href="/logout/"><i class="fas fa-sign-out-alt fa-2x"></i></a></div>
 </div>
 <div class="form-group right_panel_form">
-  <label for="search-name">Пошук за назвою ( name1 | name2 | ... )</label>
-  <input type="text" placeholder="Пошук" id="search-name" class="form-control"/>
+  <label for="search-by-name-field">Пошук за назвою ( name1 | name2 | ... )</label>
+  <input type="text" placeholder="Пошук" id="search-by-name-field" class="form-control"/>
   <select class="custom-select">
     <option selected="selected">Сортувати ...</option>
     <option value="1">За алфавітом</option>

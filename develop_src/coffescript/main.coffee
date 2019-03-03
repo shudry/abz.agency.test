@@ -57,6 +57,13 @@ class AJAXEmployeesManager
             if data.results or data.count > 0 or not data.next
                 $("#employee-load-more-first-loads").remove()
 
+            #Show warning alerts "employees not found"
+            if Object.keys(shownFirstWorkersId).length == 0
+                if not data.results or data.count == 0
+                    $('#not-found-employees-warning').css(
+                            display: "block"
+                        )
+
             for element in data.results
                 if not shownFirstWorkersId[element.id]
                     shownFirstWorkersId[element.id] = {

@@ -24,7 +24,7 @@ class AJAXEmployeesManager
             <div class="employee" id="employee-id-#{element.id}">
                 <div class="row">
                     <div class="col-md-1 employee-image"><i class="fas fa-user-tie fa-2x"></i></div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <p>#{element.name}</p>
                     </div>
                     <div class="col-md-2">
@@ -36,7 +36,7 @@ class AJAXEmployeesManager
                     <div class="col-md-2">
                       <p>#{element.date_join}</p>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-2">
                       <p>#{element.id}</p>
                     </div>
                 </div>
@@ -62,6 +62,13 @@ class AJAXEmployeesManager
         @getEmployee url, (data, textStatus, jqXHR) ->
             if data.results or data.count > 0 or not data.next
                 $("#employee-load-more-first-loads").remove()
+
+            #Show warning alerts "employees not found"
+            if Object.keys(shownFirstWorkersId).length == 0
+                if not data.results or data.count == 0
+                    $('#not-found-employees-warning').css(
+                            display: "block"
+                        )
 
             for element in data.results
                 if not shownFirstWorkersId[element.id]
@@ -100,6 +107,26 @@ class AJAXEmployeesManager
                     thisContext.showSecondHierarchy e.target.id, data.next, thisContext.secondCount
 
 
+    hideAllEmployeesInContainer: () ->
+        for element in Object.keys(shownFirstWorkersId)
+            $("employee-id-#{element}").css(
+                    display: "none"
+                )
+
+        $("#employee-load-more-first-loads").css(
+                display: "none"
+            )
+
+    showAllEmployeesInContainer: () ->
+        for element in Object.keys(shownFirstWorkersId)
+            $("employee-id-#{element}").css(
+                    display: "block"
+                )
+
+        $("#employee-load-more-first-loads").css(
+                display: "block"
+            )
+
 
     showEmployees: () ->
         @showFirstHierarchy @firstCount
@@ -109,13 +136,67 @@ class AJAXEmployeesManager
     #        if not shownFirstWorkersId[element].isAlreadyInitialize
     #            @showSecondHierarchy element, @secondCount
 
-    showListWorkers: () ->
-        console.log shownFirstWorkersId
+    getListWorkers: () ->
+        return shownFirstWorkersId
 
 
 
 
 $(document).ready ->
     me2 = new AJAXEmployeesManager 40, 10
-    
     me2.showEmployees()
+
+
+    delay = (callback, ms=1000) ->
+        timer = 0;
+        return () ->
+            context = this
+            args = arguments
+            clearTimeout timer
+
+            callbackRet = () ->
+                callback.apply context, args
+
+            timer = setTimeout callbackRet, ms || 0
+
+
+    # Input search by name
+    $('#search-by-name-field').keyup delay (e) ->
+        data = e.currentTarget.value
+        
+        if data.length >= 3        
+            if "|" in data
+                result_data = data.split("|")
+
+                last = result_data[result_data.length - 1]
+                if last.length >= 3
+                    fieldSearchByName result_data
+            else
+                fieldSearchByName [data]
+
+
+    fieldSearchByName = (stringData) ->
+        url = "/employee/search/"
+        send_data = {
+            limit: 20
+            fieldName: "name__icontains"
+            data: stringData.join()
+        }
+        #console.log data
+        searchRequestToServer url, send_data, (data, textStatus, jqXHR) ->
+            #this is success function
+            console.log data
+
+
+    searchRequestToServer = (url, requestData, requestDone) ->
+        request = $.ajax 
+            url: url
+            type: "GET"
+            data: requestData
+
+        request.fail searchRequestError
+        request.done requestDone
+
+    searchRequestError = (jqXHR, textStatus, errorThrown) ->
+        console.log "------ Error search request -----"
+        console.log errorThrown

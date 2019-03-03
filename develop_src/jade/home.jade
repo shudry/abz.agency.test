@@ -15,7 +15,7 @@
     .header.row
         {% if request.user.is_authenticated %}
         .col-md-1
-        .col-md-4
+        .col-md-3
             p Name
         .col-md-2
             p Work Position
@@ -23,7 +23,7 @@
             p Wage
         .col-md-2
             p Date Join
-        .col-md-1
+        .col-md-2
             p Id
         {% else %}
         for table_name in ["", "Name", "Work Position", "Id"]
@@ -31,6 +31,16 @@
                 p #{table_name}
         {% endif %}
 
+    .employee.load-more-empl#not-found-employees-warning
+        .row.justify-content-md-center
+            .col-lg-8.col-md-10
+                div(role="alert").row.alert.alert-warning.text-center 
+                    .col-md-1
+                        i.fas.fa-exclamation.fa-2x
+                    .col-md-11
+                        |Не знайдено жодного працівника. Будь ласка, заповніть базу робітниками або виконайте:
+                        br
+                        b ./manage.py seed_workers -w ...
 
 {% endblock content %}
 
@@ -49,8 +59,8 @@
             i.fas.fa-sign-out-alt.fa-2x
 
 .form-group.right_panel_form
-    label(for="search-name") Пошук за назвою ( name1 | name2 | ... )
-    input(type="text", placeholder="Пошук").form-control#search-name
+    label(for="search-by-name-field") Пошук за назвою ( name1 | name2 | ... )
+    input(type="text", placeholder="Пошук").form-control#search-by-name-field
     select.custom-select
         option(selected) Сортувати ...
         option(value="1") За алфавітом

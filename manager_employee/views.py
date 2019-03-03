@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -88,6 +88,33 @@ class RestEmployee(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(recent_employees, many=True)
         return Response(serializer.data)
+
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        field_name = request.GET.get('fieldName', '')
+        data = request.GET.get('data', '')
+        
+        if not field_name or not data:
+            response = {'detail': 'No parameter <fieldName> or <data>'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        if field_name.split('__')[0] in ['name', 'work_position', 'date_join', 'wage']:
+            filter_kwargs = {}
+            filter_kwargs[field_name] = data
+            recent_employees = self.get_queryset().filter(**filter_kwargs)
+
+            page = self.paginate_queryset(recent_employees)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(recent_employees, many=True)
+            return Response(serializer.data)
+        
+        response = {'detail': '<fieldName> is incorrect'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 
     def get_serializer_class(self):
     	if self.request.user.is_authenticated:

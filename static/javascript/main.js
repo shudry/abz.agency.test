@@ -47,6 +47,13 @@
         if (data.results || data.count > 0 || !data.next) {
           $("#employee-load-more-first-loads").remove();
         }
+        if (Object.keys(shownFirstWorkersId).length === 0) {
+          if (!data.results || data.count === 0) {
+            $('#not-found-employees-warning').css({
+              display: "block"
+            });
+          }
+        }
         ref = data.results;
         for (i = 0, len = ref.length; i < len; i++) {
           element = ref[i];
