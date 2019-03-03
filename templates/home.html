@@ -5,11 +5,7 @@
 {% block content %}
 <div class="about-project">
   <h2>Тестовий проект для abz.agency </h2>
-  <ul>
-    <li>
-      <p>GitHub - <a href="https://github.com/shudry/abz.agency.test">https://github.com/shudry/abz.agency.test</a></p>
-    </li>
-  </ul>
+  <div class="github-link"><i class="fab fa-github fa-2x"></i><a href="https://github.com/shudry/abz.agency.test">https://github.com/shudry/abz.agency.test</a></div>
   <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus est praesentium illum corporis dolor soluta non laudantium sequi modi commodi quo numquam, doloremque, tempora officia inventore repellat recusandae voluptatibus. Distinctio. </p>
 </div>
 <div class="container-workers">
@@ -47,12 +43,12 @@
 {% block right_panel %}
 {% if request.user.is_authenticated %}
 <div class="is-authenticated-block row">
-  <div class="col-lg-2"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
+  <div class="col-lg-2 employee-image-admin"><i class="fas fa-user-tie fa-2x"></i></div>
   <div class="col-lg-7">{% if request.user.is_superuser %}
     <h5 class="name">{{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})</h5>
     <p>Адміністратор</p>{% endif %}
   </div>
-  <div class="col-lg-3"></div>
+  <div class="col-lg-3 block-icon-logout"><a href="/logout/"><i class="fas fa-sign-out-alt fa-2x"></i></a></div>
 </div>
 <div class="form-group right_panel_form">
   <label for="search-name">Пошук за назвою ( name1 | name2 | ... )</label>
@@ -67,6 +63,23 @@
   </select>
 </div>{% else %}
 <div class="signed-block row">
-  <h5>Блок для входу, реєстрації тощо.</h5>
+  <form action="/login/" method="POST">
+    {% csrf_token %}
+    {% if error_login %}
+    <div role="alert" class="alert alert-danger">{{ error_login }}</div>{% endif %}
+    <div class="form-group">
+      <label for="login-field">Введіть логін:</label>
+      <input type="text" name="username" id="login-field" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label for="password-field">Введіть пароль:</label>
+      <input type="password" name="password" id="password-field" class="form-control"/>
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto">
+        <button type="submit" class="btn btn-default">Відправити</button>
+      </div>
+    </div>
+  </form>
 </div>{% endif %}
 {% endblock right_panel %}

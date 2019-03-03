@@ -28,16 +28,37 @@ body
     a:hover
         color: #236
         text-decoration: none
+        
+    .github-link
+        margin: 0 0 25px 50px
+        display: inline-block;
+        i
+            padding-top: -8px
+            padding-right: 10px
+        a
+            vertical-align: top
+
+
+.employee-image
+    //background-color: white
+    //border-radius: 50%
+    i
+        padding-top: 10px;
+        color: workers-header-bg
+        //color: white
             
-
-
-.img-circle
-    border-radius: 50%
+.employee-image-admin
+    i
+        padding-top: 15px
+        padding-left: 10px
+        color: white
+        
     
 .container-workers
     > .header
         background-color: workers-header-bg
         color: white
+        border-radius: 3px 3px 0 0
         
         p
             margin-top: 15px
@@ -69,28 +90,29 @@ body
                 background-color: second-workers-content-bg
                 border-top: 1px solid second-workers-border-color
                 
-.employee-load-more-link
-	margin: 25px 0 25px 0
-	background-color: workers-header-bg
-	color: white
-	border: none
-	border-radius: 0px
-	
-	&:visited, &:link, &:active, &:focus
-		color: white
-		box-shadow: none
-		border: none
+.employee-load-more-link, .signed-block button
+    margin: 25px 0 25px 0
+    background-color: workers-header-bg
+    color: white
+    border: none
+    border-radius: 0px
+    
+    &:visited, &:link, &:active, &:focus
+        color: white
+        box-shadow: none
+        border: none
 
-	&:hover
-		color: #888
-		cursor: pointer
-		background-color: second-workers-content-bg
+    &:hover
+        color: #888
+        cursor: pointer
+        background-color: second-workers-content-bg
         
 
 .is-authenticated-block
     background-color: workers-header-bg
     padding: 10px 0 10px 0
     margin: 25px 0 25px 0
+    border-radius: 3px
 
     img
         margin: 15px 0 15px 0
@@ -102,10 +124,24 @@ body
     h5.name
         color: white
         margin-top: 12px
+    
+    .block-icon-logout
+        padding-top: 15px
+        i
+            color: #C00
+        i:hover
+            color: #A00
 
 .signed-block
     padding: 10px 0 10px 0
     margin: 25px 0 25px 10px
+    
+    form
+        label
+            margin-bottom: 0px
+            padding-left: 5px
+        button
+            margin-top: 0
     
 .right_panel_form.form-group
     padding-top: 25px

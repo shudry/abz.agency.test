@@ -6,10 +6,9 @@
 {% block content %}
 .about-project
     h2 Тестовий проект для abz.agency 
-    ul
-        li
-            p GitHub - 
-                a(href="https://github.com/shudry/abz.agency.test") https://github.com/shudry/abz.agency.test
+    .github-link
+        i.fab.fa-github.fa-2x
+        a(href="https://github.com/shudry/abz.agency.test") https://github.com/shudry/abz.agency.test
     p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus est praesentium illum corporis dolor soluta non laudantium sequi modi commodi quo numquam, doloremque, tempora officia inventore repellat recusandae voluptatibus. Distinctio. 
 
 .container-workers
@@ -38,14 +37,16 @@
 {% block right_panel %}
 {% if request.user.is_authenticated %}
 .is-authenticated-block.row
-    .col-lg-2
-        img(src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50").img-circle
+    .col-lg-2.employee-image-admin
+        i.fas.fa-user-tie.fa-2x
     .col-lg-7
         {% if request.user.is_superuser %}
         h5.name {{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})
         p Адміністратор
         {% endif %}
-    .col-lg-3
+    .col-lg-3.block-icon-logout
+        a(href="/logout/")
+            i.fas.fa-sign-out-alt.fa-2x
 
 .form-group.right_panel_form
     label(for="search-name") Пошук за назвою ( name1 | name2 | ... )
@@ -59,6 +60,20 @@
         option(value="5") Спочатку найменша зарплата
 {% else %}
 .signed-block.row
-    h5 Блок для входу, реєстрації тощо.
+    form(action="/login/", method="POST")
+        {% csrf_token %}
+        {% if error_login %}
+        div(role="alert").alert.alert-danger {{ error_login }}
+        {% endif %}
+        .form-group
+            label(for="login-field") Введіть логін:
+            input(type="text", name="username").form-control#login-field
+        .form-group
+            label(for="password-field") Введіть пароль:
+            input(type="password", name="password").form-control#password-field
+        
+        .row.justify-content-md-center
+            .col-md-auto
+                button(type="submit").btn.btn-default Відправити
 {% endif %}
 {% endblock right_panel %}

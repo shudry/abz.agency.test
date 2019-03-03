@@ -7,6 +7,7 @@ router = routers.SimpleRouter()
 router.register(r'employee', RestEmployee)
 
 urlpatterns = [
+    path('logout/', auth_logout, name="logout"),
     path('login/', AuthenticateUser.as_view()),    
     path('', MainPage.as_view(), name='main_page'),
 ]

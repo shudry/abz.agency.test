@@ -23,7 +23,7 @@ class AJAXEmployeesManager
         html = """
             <div class="employee" id="employee-id-#{element.id}">
                 <div class="row">
-                    <div class="col-md-1"><img src="https://avatars0.githubusercontent.com/u/31619203?s=40&amp;v=4" alt="Logo" width="50" height="50" class="img-circle"/></div>
+                    <div class="col-md-1 employee-image"><i class="fas fa-user-tie fa-2x"></i></div>
                     <div class="col-md-4">
                       <p>#{element.name}</p>
                     </div>

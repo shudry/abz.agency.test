@@ -1,6 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.http import HttpResponseNotFound
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth import login as auth_login
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -20,6 +23,7 @@ class MainPage(View):
         self.get_static_context
 
     def get(self, request):
+        self.context_data['error_login'] = request.GET.get('error-login', None)
         return render(request, self.template_name, self.context_data)
 
     @property
@@ -28,19 +32,17 @@ class MainPage(View):
 
 
 class AuthenticateUser(View):
-
-    def get(self, request):
-        return HttpResponseNotFound('<h3>Not found this login page</h3>')
-
     def post(self, request):
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
 
-        if username is None or password is None:
-            return HttpResponseNotFound('<h1>Argument error</h1>')
+        if not username or not password:
+            return redirect('/?error-login=Sent data is incorrect')
 
-        if not User.objects.filter(username=username):
-            return HttpResponseNotFound('<h1>User not found</h1>')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return redirect('/?error-login=Username not found')
 
         user_auth = authenticate(username=user.username, password=password)
 
@@ -49,7 +51,13 @@ class AuthenticateUser(View):
                 auth_login(request, user_auth)
                 return redirect('/')
 
-        return HttpResponseNotFound('<h1>Password is not valid!</h1>')
+        return redirect('/?error-login=Password is not valid')
+
+
+def auth_logout(request):
+    if request.user.is_authenticated:
+        logout(request)
+    return redirect('/')
 
 
 class RestEmployee(viewsets.ModelViewSet):
