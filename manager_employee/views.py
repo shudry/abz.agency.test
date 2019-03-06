@@ -28,7 +28,7 @@ class MainPage(View):
 
     @property
     def get_static_context(self):
-        self.context_data['page_name'] = "Main context test"
+        self.context_data['page_name'] = "Employees manager"
 
 
 class AuthenticateUser(View):
@@ -37,12 +37,12 @@ class AuthenticateUser(View):
         password = request.POST.get('password', None)
 
         if not username or not password:
-            return redirect('/?error-login=Sent data is incorrect')
+            return self._redirect_with_error('/', 'Sent data is incorrect')
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return redirect('/?error-login=Username not found')
+            return self._redirect_with_error('/', 'Username not found')
 
         user_auth = authenticate(username=user.username, password=password)
 
@@ -51,7 +51,11 @@ class AuthenticateUser(View):
                 auth_login(request, user_auth)
                 return redirect('/')
 
-        return redirect('/?error-login=Password is not valid')
+        return self._redirect_with_error('/', 'Password is not valid')
+
+
+    def _redirect_with_error(self, url, error_text):
+        return redirect('{url}?error-login={error}'.format(url=url, error=error_text))
 
 
 def auth_logout(request):
@@ -65,29 +69,21 @@ class RestEmployee(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def subordinates(self, request, pk=None):
+        """ Shows all subordinate chief """
+
         employee = self.get_object()
         recent_employees = self.get_queryset().filter(chief=employee)
 
-        page = self.paginate_queryset(recent_employees)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(recent_employees, many=True)
-        return Response(serializer.data)
+        return self._get_response_paginated_queryset(recent_employees)
 
 
     @action(detail=False, methods=['get'])
     def withoutchief(self, request):
+        """ Shows all employees who do not have a boss """
+
         recent_employees = self.get_queryset().filter(chief=None)
 
-        page = self.paginate_queryset(recent_employees)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(recent_employees, many=True)
-        return Response(serializer.data)
+        return self._get_response_paginated_queryset(recent_employees)
 
 
     @action(detail=False, methods=['get'])
@@ -95,28 +91,42 @@ class RestEmployee(viewsets.ModelViewSet):
         field_name = request.GET.get('fieldName', '')
         data = request.GET.get('data', '')
         
+        print("REQUEST DATA: {}".format(data))
+
         if not field_name or not data:
             response = {'detail': 'No parameter <fieldName> or <data>'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+        filter_kwargs = {}
+        recent_employees = []
         if field_name.split('__')[0] in ['name', 'work_position', 'date_join', 'wage']:
-            filter_kwargs = {}
-            filter_kwargs[field_name] = data
-            recent_employees = self.get_queryset().filter(**filter_kwargs)
+            for search_field in data.split(','):
+                filter_kwargs[field_name] = search_field
+                recent_employees.extend(self.get_queryset().filter(**filter_kwargs))
 
-            page = self.paginate_queryset(recent_employees)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-            serializer = self.get_serializer(recent_employees, many=True)
-            return Response(serializer.data)
+            return self._get_response_paginated_queryset(recent_employees)
         
         response = {'detail': '<fieldName> is incorrect'}
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
     def get_serializer_class(self):
-    	if self.request.user.is_authenticated:
-    		return EmployeeSerializerIsAuthenticated
-    	return EmployeeSerializer
+        """ If the user is logged in, display all fields of the model """
+
+        if self.request.user.is_authenticated:
+            return EmployeeSerializerIsAuthenticated
+
+        return EmployeeSerializer
+
+
+    def _get_response_paginated_queryset(self, queryset):
+        """ Send a response broken down by page """
+
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
