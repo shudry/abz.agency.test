@@ -49,6 +49,16 @@
       </div>
     </div>
   </div>
+  <div id="alert_server_error" class="employee load-more-empl">
+    <div class="row justify-content-md-center">
+      <div class="col-lg-8 col-md-10">
+        <div role="alert" class="row alert alert-danger text-center"> 
+          <div class="col-md-1"><i class="fas fa-exclamation-triangle fa-2x"></i></div>
+          <div class="col-md-11">На сервері виникла помилка. Будь ласка повторіть спробу або спробуйте пізніше.<br/><b id="error_message"></b></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>{% endblock content %}
 {% block right_panel %}
 {% if request.user.is_authenticated %}
@@ -61,10 +71,12 @@
   <div class="col-lg-3 block-icon-logout"><a href="/logout/"><i class="fas fa-sign-out-alt fa-2x"></i></a></div>
 </div>
 <div class="form-group right_panel_form">
-  <label for="search-by-name-field">Пошук за назвою ( name1 | name2 | ... )</label>
-  <input type="text" placeholder="Пошук" id="search-by-name-field" class="form-control"/>
-  <label for="search-by-work-position-field">Пошук за посадою ( work1 | work2 | ... )</label>
-  <input type="text" placeholder="Пошук" id="search-by-work-position-field" class="form-control"/>
+  <label for="search-by-name-field">Пошук за назвою:</label>
+  <input type="text" placeholder="( name1 | name2 | ... )" id="search-by-name-field" class="form-control"/>
+  <label for="search-by-work-position-field">Пошук за посадою:</label>
+  <input type="text" placeholder="( work1 | work2 | ... )" id="search-by-work-position-field" class="form-control"/>
+  <label for="search-by-wage-field">Пошук по заробітній платі:</label>
+  <input type="text" placeholder="( wage1 | wage2 | ... )" id="search-by-wage-field" class="form-control"/>
   <select class="custom-select">
     <option selected="selected">Сортувати ...</option>
     <option value="1">За алфавітом</option>

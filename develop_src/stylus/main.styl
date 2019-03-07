@@ -54,7 +54,7 @@ body
         color: white
         
 //Warnings container in employee list
-#not-found-employees-warning
+#not-found-employees-warning, #alert_server_error
     display: none
 
 .container-workers
@@ -81,6 +81,9 @@ body
 
             .fa-exclamation
                 color: #F70
+            
+            .fa-exclamation-triangle
+                color: red
 
     
     //First hierarchy
@@ -162,7 +165,7 @@ body
         color: #666
         
     select
-        margin-top: 10px
+        margin-top: 40px
         
     #search-by-name-field, #search-by-work-position-field
         display: inline-block

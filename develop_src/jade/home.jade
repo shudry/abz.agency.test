@@ -42,6 +42,17 @@
                         br
                         b ./manage.py seed_workers -w ...
 
+    .employee.load-more-empl#alert_server_error
+        .row.justify-content-md-center
+            .col-lg-8.col-md-10
+                div(role="alert").row.alert.alert-danger.text-center 
+                    .col-md-1
+                        i.fas.fa-exclamation-triangle.fa-2x
+                    .col-md-11
+                        |На сервері виникла помилка. Будь ласка повторіть спробу або спробуйте пізніше.
+                        br
+                        b#error_message
+
 {% endblock content %}
 
 {% block right_panel %}
@@ -59,11 +70,14 @@
             i.fas.fa-sign-out-alt.fa-2x
 
 .form-group.right_panel_form
-    label(for="search-by-name-field") Пошук за назвою ( name1 | name2 | ... )
-    input(type="text", placeholder="Пошук").form-control#search-by-name-field
+    label(for="search-by-name-field") Пошук за назвою:
+    input(type="text", placeholder="( name1 | name2 | ... )").form-control#search-by-name-field
 
-    label(for="search-by-work-position-field") Пошук за посадою ( work1 | work2 | ... )
-    input(type="text", placeholder="Пошук").form-control#search-by-work-position-field
+    label(for="search-by-work-position-field") Пошук за посадою:
+    input(type="text", placeholder="( work1 | work2 | ... )").form-control#search-by-work-position-field
+
+    label(for="search-by-wage-field") Пошук по заробітній платі:
+    input(type="text", placeholder="( wage1 | wage2 | ... )").form-control#search-by-wage-field
 
     select.custom-select
         option(selected) Сортувати ...

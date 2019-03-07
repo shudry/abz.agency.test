@@ -7,16 +7,15 @@ class AJAXEmployeesManager
     constructor: (@firstCount, @secondCount) ->
 
     getEmployee: (url, requestDone) ->
+        thisContext = this
         request = $.ajax 
             url: url
             type: "GET"
 
-        request.fail @AJAXerrorGetWorkers
         request.done requestDone
-
-    AJAXerrorGetWorkers: (jqXHR, textStatus, errorThrown) ->
-        #error request AJAX
-        console.log "Error: #{jqXHR}, #{textStatus}, #{errorThrown}"
+        request.fail (jqXHR, textStatus, errorThrown) ->
+            #error request AJAX
+            thisContext.showErrorAlert errorThrown
 
 
     appendElementToDOM = (element, id) ->
@@ -123,19 +122,42 @@ class AJAXEmployeesManager
             $("#employee-id-#{element}").css(display: "none")
         $("#employee-load-more-first-loads").css(display: "none")
 
-        # Remove search results
-        $('[id^="employee-search-result-"]').remove()
-
     showAllEmployeesInContainer: () ->
+        @clearContainer()
+
         for element in Object.keys(shownFirstWorkersId)
-            $("employee-id-#{element}").css(display: "block")
+            $("#employee-id-#{element}").css(display: "block")
         $("#employee-load-more-first-loads").css(display: "block")
 
+
     showNotFoundAlert: () ->
+        @clearContainer()
+
         $('#not-found-employees-warning').css(display: "block")
+
 
     hideNotFoundAlert: () ->
         $('#not-found-employees-warning').css(display: "none")
+
+    showErrorAlert: (errorText) ->
+        @clearContainer()
+
+        $('#alert_server_error').css(display: "block")
+        $('#alert_server_error #error_message').text(errorText)
+
+
+    hideErrorAlert: () ->
+        $('#alert_server_error').css(display: "none")
+
+    removeSearchResults: () ->
+        $('[id^="employee-search-result-"]').remove()
+
+    clearContainer: () ->
+        # Remove search results and hide all components
+        @removeSearchResults()
+        @hideNotFoundAlert()
+        @hideErrorAlert()
+        @hideAllEmployeesInContainer()
 
     showEmployees: () ->
         @showFirstHierarchy @firstCount
@@ -200,40 +222,44 @@ $(document).ready ->
     sendSearchBy = () ->
         byNameData = normalizeSendData($('#search-by-name-field').val())
         byWorkPositionData = normalizeSendData($('#search-by-work-position-field').val())
+        byWageData = normalizeSendData($('#search-by-wage-field').val())
 
-        requestSearchFieldsData = 'by_name=' + byNameData.join() + ','
-        requestSearchFieldsData += 'by_work_position=' + byWorkPositionData.join() + ','
+        requestSearchFieldsData = ''
+        
+        if byNameData.length > 0 and byNameData[0] != ''
+            requestSearchFieldsData += 'name__icontains=' + byNameData.join() + '|'
+    
+        if byWorkPositionData.length > 0 and byWorkPositionData[0] != ''
+            requestSearchFieldsData += 'work_position__icontains=' + byWorkPositionData.join() + '|'
+
+        if byWageData.length > 0 and byWageData[0] != ''
+            requestSearchFieldsData += 'wage=' + byWageData.join() + '|'
+        
+        if requestSearchFieldsData.length == 0
+            return managerEmployees.showAllEmployeesInContainer()
+
         requestSearchFieldsData.slice(0, -1)
 
         requestData = encodeURIComponent(requestSearchFieldsData)
-        limit = 1
+        limit = 20
 
         url = "/employee/search/?limit=#{limit}&data=#{requestData}"
-        managerEmployees.hideAllEmployeesInContainer()
-        
-        managerEmployees.hideNotFoundAlert()
+        managerEmployees.clearContainer()
         managerEmployees.showFirstHierarchy(20, url, true)
 
 
     functionSearchBy = (e) ->
         data = e.currentTarget.value
 
-        if data.length >= 3
-            appendSpinner(e.currentTarget)
+        appendSpinner(e.currentTarget)
+        
+        sendSearchBy()
 
-            if "|" in data
-                resultData = data.split("|")
-
-                last = resultData[resultData.length - 1]
-                if last.length >= 3
-                    sendSearchBy()
-            else
-                sendSearchBy()
-
-            functionTimeout = () ->
-                removeSpinner(e.currentTarget)
-            setTimeout functionTimeout, 1000
+        functionTimeout = () ->
+            removeSpinner(e.currentTarget)
+        setTimeout functionTimeout, 1000
 
 
     $('#search-by-name-field').keyup delay functionSearchBy #Search by name
     $('#search-by-work-position-field').keyup delay functionSearchBy #Search by work position
+    $('#search-by-wage-field').keyup delay functionSearchBy #Search by wage

@@ -4,6 +4,7 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
+from django.db.models import Q
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -37,12 +38,12 @@ class AuthenticateUser(View):
         password = request.POST.get('password', None)
 
         if not username or not password:
-            return self._redirect_with_error('/', 'Sent data is incorrect')
+            return self._redirect_with_error('/', 'Заповніть пусті поля')
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return self._redirect_with_error('/', 'Username not found')
+            return self._redirect_with_error('/', 'Данний нікнейм в базі не знайдено')
 
         user_auth = authenticate(username=user.username, password=password)
 
@@ -51,7 +52,7 @@ class AuthenticateUser(View):
                 auth_login(request, user_auth)
                 return redirect('/')
 
-        return self._redirect_with_error('/', 'Password is not valid')
+        return self._redirect_with_error('/', 'Невірний пароль. Спробуйте ще раз')
 
 
     def _redirect_with_error(self, url, error_text):
@@ -66,6 +67,7 @@ def auth_logout(request):
 
 class RestEmployee(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
+    queryclass = Employee
 
     @action(detail=True, methods=['get'])
     def subordinates(self, request, pk=None):
@@ -74,7 +76,7 @@ class RestEmployee(viewsets.ModelViewSet):
         employee = self.get_object()
         recent_employees = self.get_queryset().filter(chief=employee)
 
-        return self._get_response_paginated_queryset(recent_employees)
+        return self._response_paginated_queryset(recent_employees)
 
 
     @action(detail=False, methods=['get'])
@@ -83,31 +85,82 @@ class RestEmployee(viewsets.ModelViewSet):
 
         recent_employees = self.get_queryset().filter(chief=None)
 
-        return self._get_response_paginated_queryset(recent_employees)
+        return self._response_paginated_queryset(recent_employees)
 
 
     @action(detail=False, methods=['get'])
     def search(self, request):
-        field_name = request.GET.get('fieldName', '')
         data = request.GET.get('data', '')
         
-        print("REQUEST DATA: {}".format(data))
-
-        if not field_name or not data:
-            response = {'detail': 'No parameter <fieldName> or <data>'}
+        if not data:
+            response = {'detail': 'Parameter <data> is empty'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-        filter_kwargs = {}
-        recent_employees = []
-        if field_name.split('__')[0] in ['name', 'work_position', 'date_join', 'wage']:
-            for search_field in data.split(','):
-                filter_kwargs[field_name] = search_field
-                recent_employees.extend(self.get_queryset().filter(**filter_kwargs))
+        recent_employees = self.queryclass.objects.none()
 
-            return self._get_response_paginated_queryset(recent_employees)
+        # Send to server data:
+        #   name__icontains=thisisdata,seconddata|work_position__test=...
         
-        response = {'detail': '<fieldName> is incorrect'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        for fad in data.split('|'):
+            fad_name_data = fad.split('=')
+            
+            #   fad_name_data -> 
+            #       [0]:    name__icontains
+            #       [1]:    thisisdata,seconddata
+
+            name_field = fad_name_data[0].split('__')[0]
+            
+            if name_field in ['name', 'work_position', 'date_join']:
+                data_field_list = fad_name_data[1].split(',') # ['thisisdata', 'seconddata']
+                
+                if data_field_list[0] is not None:
+                    cache_recent_employees = self.get_queryset().filter(
+                            self._matching_filter__in(fad_name_data[0], data_field_list)
+                        )
+
+                    if recent_employees.count() == 0:
+                        recent_employees = cache_recent_employees
+                    else:
+                        recent_employees = recent_employees & cache_recent_employees
+
+            elif name_field == 'wage':
+                data_field_list = fad_name_data[1].split(',') # ['0', '100']
+                
+                cache_recent_employees = self.queryclass.objects.none()
+
+                for fad_data in data_field_list:
+                    if '-' in fad_data:
+                        # In the range from and to
+                        from_range, to_range = int(fad_data.split('-')[0]), int(fad_data.split('-')[1])
+                            
+                        cache_recent_employees = cache_recent_employees | self.get_queryset().filter(
+                                **{'wage__range': tuple([from_range, to_range])}
+                            )
+                    else:
+                        if fad_data is None:
+                            continue
+
+                        # Get queryset objects wage==first integer|float
+                        cache_recent_employees = cache_recent_employees | self.get_queryset().filter(
+                                **{'wage': fad_data}
+                            )
+
+                if recent_employees.count() == 0:
+                    recent_employees = cache_recent_employees
+                else:
+                    recent_employees = recent_employees & cache_recent_employees
+
+        return self._response_paginated_queryset(recent_employees)
+
+
+    def _matching_filter__in(self, field_name, data_list):
+        """ List of objects according to the search data list """
+
+        qset = Q()
+        for i in data_list:
+            qset |= Q(**{field_name: i})
+        return qset
+
 
 
     def get_serializer_class(self):
@@ -119,7 +172,7 @@ class RestEmployee(viewsets.ModelViewSet):
         return EmployeeSerializer
 
 
-    def _get_response_paginated_queryset(self, queryset):
+    def _response_paginated_queryset(self, queryset):
         """ Send a response broken down by page """
 
         page = self.paginate_queryset(queryset)
