@@ -56,7 +56,8 @@ class AJAXEmployeesManager
 
 
     showFirstHierarchy: (count, urlNext, isSearchResult=false) ->
-        url = urlNext or "/employee/withoutchief/?limit=#{count}"
+        sorted = encodeURIComponent($('#select-sorted-by').val())
+        url = urlNext or "/employee/withoutchief/?limit=#{count}&sorted=#{sorted}"
         thisContext = this
 
         @getEmployee url, (data, textStatus, jqXHR) ->
@@ -95,7 +96,8 @@ class AJAXEmployeesManager
 
 
     showSecondHierarchy: (elementID, urlNext, count, doUseGlobalArray=true) ->
-        url = urlNext or "/employee/#{elementID}/subordinates/?limit=#{count}"
+        sorted = encodeURIComponent($('#select-sorted-by').val())
+        url = urlNext or "/employee/#{elementID}/subordinates/?limit=#{count}&sorted=#{sorted}"
         thisContext = this
 
         @getEmployee url, (data, textStatus, jqXHR) ->
@@ -158,6 +160,12 @@ class AJAXEmployeesManager
         @hideNotFoundAlert()
         @hideErrorAlert()
         @hideAllEmployeesInContainer()
+
+    removeEmployees: () ->
+        for element in Object.keys(shownFirstWorkersId)
+            $("#employee-id-#{element}").remove()
+
+        shownFirstWorkersId = {}
 
     showEmployees: () ->
         @showFirstHierarchy @firstCount
@@ -236,16 +244,19 @@ $(document).ready ->
             requestSearchFieldsData += 'wage=' + byWageData.join() + '|'
         
         if requestSearchFieldsData.length == 0
-            return managerEmployees.showAllEmployeesInContainer()
+            managerEmployees.showAllEmployeesInContainer()
+            return false
 
         requestSearchFieldsData.slice(0, -1)
 
         requestData = encodeURIComponent(requestSearchFieldsData)
         limit = 20
 
-        url = "/employee/search/?limit=#{limit}&data=#{requestData}"
+        sorted = encodeURIComponent($('#select-sorted-by').val())
+        url = "/employee/search/?limit=#{limit}&data=#{requestData}&sorted=#{sorted}"
         managerEmployees.clearContainer()
         managerEmployees.showFirstHierarchy(20, url, true)
+        return true
 
 
     functionSearchBy = (e) ->
@@ -260,6 +271,20 @@ $(document).ready ->
         setTimeout functionTimeout, 1000
 
 
+    functionSortedBy = (e) ->
+        #console.log this.value
+        #console.log $('#select-sorted-by').val()
+
+        if sendSearchBy()
+            return
+
+        managerEmployees.clearContainer()
+        managerEmployees.removeEmployees()
+        managerEmployees.showEmployees()
+
+
     $('#search-by-name-field').keyup delay functionSearchBy #Search by name
     $('#search-by-work-position-field').keyup delay functionSearchBy #Search by work position
     $('#search-by-wage-field').keyup delay functionSearchBy #Search by wage
+    
+    $('#select-sorted-by').change functionSortedBy #Select sorted by

@@ -79,13 +79,13 @@
     label(for="search-by-wage-field") Пошук по заробітній платі:
     input(type="text", placeholder="( wage1 | wage2 | ... )").form-control#search-by-wage-field
 
-    select.custom-select
-        option(selected) Сортувати ...
-        option(value="1") За алфавітом
-        option(value="2") Спочатку новіші
-        option(value="3") Спочатку старіші
-        option(value="4") Спочатку найбільша зарплата
-        option(value="5") Спочатку найменша зарплата
+    select.custom-select#select-sorted-by
+        option(value="?", selected) Сортувати ...
+        option(value="name") За алфавітом
+        option(value="-date_join") Спочатку новіші
+        option(value="date_join") Спочатку старіші
+        option(value="-wage") Спочатку найбільша зарплата
+        option(value="wage") Спочатку найменша зарплата
 {% else %}
 .signed-block.row
     form(action="/login/", method="POST")

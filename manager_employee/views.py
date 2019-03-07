@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 from django.db.models import Q
+from django.db.models.query import QuerySet
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -76,6 +77,10 @@ class RestEmployee(viewsets.ModelViewSet):
         employee = self.get_object()
         recent_employees = self.get_queryset().filter(chief=employee)
 
+        sorted_by = request.GET.get('sorted', None)
+        if sorted_by is not None:
+            recent_employees = self.sorted(request, recent_employees, sorted_by) 
+
         return self._response_paginated_queryset(recent_employees)
 
 
@@ -85,12 +90,17 @@ class RestEmployee(viewsets.ModelViewSet):
 
         recent_employees = self.get_queryset().filter(chief=None)
 
+        sorted_by = request.GET.get('sorted', None)
+        if sorted_by is not None:
+            recent_employees = self.sorted(request, recent_employees, sorted_by)
+
         return self._response_paginated_queryset(recent_employees)
 
 
     @action(detail=False, methods=['get'])
     def search(self, request):
         data = request.GET.get('data', '')
+        sorted_by = request.GET.get('sorted', None)
         
         if not data:
             response = {'detail': 'Parameter <data> is empty'}
@@ -150,6 +160,9 @@ class RestEmployee(viewsets.ModelViewSet):
                 else:
                     recent_employees = recent_employees & cache_recent_employees
 
+        if sorted_by is not None:
+            recent_employees = self.sorted(request, recent_employees, sorted_by)
+
         return self._response_paginated_queryset(recent_employees)
 
 
@@ -158,9 +171,19 @@ class RestEmployee(viewsets.ModelViewSet):
 
         qset = Q()
         for i in data_list:
-            qset |= Q(**{field_name: i})
+            try:
+                if len(i) != 0:
+                    qset |= Q(**{field_name: i})
+            except TypeError:
+                qset |= Q(**{field_name: i})
         return qset
 
+
+    def sorted(self, request, queryset, order_by):
+        if not isinstance(queryset, type(QuerySet())):
+            return queryset
+
+        return queryset.order_by(order_by)
 
 
     def get_serializer_class(self):
