@@ -28,6 +28,13 @@
       });
     };
 
+    AJAXEmployeesManager.prototype.getLocationPathname = function(href) {
+      var l;
+      l = document.createElement("a");
+      l.href = href;
+      return l.pathname + l.search;
+    };
+
     appendElementToDOM = function(element, id) {
       var html, id_element;
       id_element = id ? "employee-" + id + "-" + element.id : "employee-id-" + element.id;
@@ -81,7 +88,7 @@
         if (data.next) {
           $(".container-workers").append(appendElementLoadMore("first-loads"));
           return $("#employee-load-more-first-loads").find("a").click(function(e) {
-            return thisContext.showFirstHierarchy(count, data.next, isSearchResult);
+            return thisContext.showFirstHierarchy(count, thisContext.getLocationPathname(data.next), isSearchResult);
           });
         }
       });
@@ -114,7 +121,7 @@
         if (data.next) {
           $("#employee-id-" + elementID).append(appendElementLoadMore(elementID));
           return $("#employee-load-more-" + elementID).find("a").click(function(e) {
-            return thisContext.showSecondHierarchy(e.target.id, data.next, thisContext.secondCount, doUseGlobalArray);
+            return thisContext.showSecondHierarchy(e.target.id, thisContext.getLocationPathname(data.next), thisContext.secondCount, doUseGlobalArray);
           });
         }
       });

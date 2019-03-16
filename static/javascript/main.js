@@ -28,6 +28,13 @@
       return console.log("Error: " + jqXHR + ", " + textStatus + ", " + errorThrown);
     };
 
+    AJAXEmployeesManager.prototype.getLocationPathname = function(href) {
+      var l;
+      l = document.createElement("a");
+      l.href = href;
+      return l.pathname + l.search;
+    };
+
     appendElementToDOM = function(element) {
       var html;
       return html = "<div class=\"employee\" id=\"employee-id-" + element.id + "\">\n    <div class=\"row\">\n        <div class=\"col-md-3 employee-image\"><i class=\"fas fa-user-tie fa-2x\"></i></div>\n        <div class=\"col-md-3\">\n          <p>" + element.name + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.work_position + "</p>\n        </div>\n        <div class=\"col-md-3\">\n          <p>" + element.id + "</p>\n        </div>\n    </div>\n</div>";
@@ -69,7 +76,7 @@
         if (data.next) {
           $(".container-workers").append(appendElementLoadMore("first-loads"));
           return $("#employee-load-more-first-loads").find("a").click(function(e) {
-            return thisContext.showFirstHierarchy(count, data.next);
+            return thisContext.showFirstHierarchy(count, thisContext.getLocationPathname(data.next));
           });
         }
       });
@@ -95,7 +102,7 @@
         if (data.next) {
           $("#employee-id-" + elementID).append(appendElementLoadMore(elementID));
           return $("#employee-load-more-" + elementID).find("a").click(function(e) {
-            return thisContext.showSecondHierarchy(e.target.id, data.next, thisContext.secondCount);
+            return thisContext.showSecondHierarchy(e.target.id, thisContext.getLocationPathname(data.next), thisContext.secondCount);
           });
         }
       });

@@ -18,6 +18,12 @@ class AJAXEmployeesManager
             thisContext.showErrorAlert errorThrown
 
 
+    getLocationPathname: (href) ->
+        l = document.createElement "a"
+        l.href = href
+        return l.pathname + l.search
+
+
     appendElementToDOM = (element, id) ->
         id_element = if id then "employee-#{id}-#{element.id}" else "employee-id-#{element.id}"
         html = """
@@ -91,7 +97,7 @@ class AJAXEmployeesManager
             if data.next
                 $(".container-workers").append(appendElementLoadMore "first-loads")
                 $("#employee-load-more-first-loads").find("a").click (e) ->
-                    thisContext.showFirstHierarchy count, data.next, isSearchResult
+                    thisContext.showFirstHierarchy count, thisContext.getLocationPathname(data.next), isSearchResult
 
 
     showSecondHierarchy: (elementID, urlNext, count, doUseGlobalArray=true) ->
@@ -114,7 +120,7 @@ class AJAXEmployeesManager
             if data.next
                 $("#employee-id-#{elementID}").append(appendElementLoadMore elementID)
                 $("#employee-load-more-#{elementID}").find("a").click (e) ->
-                    thisContext.showSecondHierarchy e.target.id, data.next, thisContext.secondCount, doUseGlobalArray
+                    thisContext.showSecondHierarchy e.target.id, thisContext.getLocationPathname(data.next), thisContext.secondCount, doUseGlobalArray
 
 
     hideAllEmployeesInContainer: () ->
