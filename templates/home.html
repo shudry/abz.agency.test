@@ -77,13 +77,13 @@
   <input type="text" placeholder="( work1 | work2 | ... )" id="search-by-work-position-field" class="form-control"/>
   <label for="search-by-wage-field">Пошук по заробітній платі:</label>
   <input type="text" placeholder="( wage1 | wage2 | ... )" id="search-by-wage-field" class="form-control"/>
-  <select class="custom-select">
-    <option selected="selected">Сортувати ...</option>
-    <option value="1">За алфавітом</option>
-    <option value="2">Спочатку новіші</option>
-    <option value="3">Спочатку старіші</option>
-    <option value="4">Спочатку найбільша зарплата</option>
-    <option value="5">Спочатку найменша зарплата</option>
+  <select id="select-sorted-by" class="custom-select">
+    <option value="?" selected="selected">Сортувати ...</option>
+    <option value="name">За алфавітом</option>
+    <option value="-date_join">Спочатку новіші</option>
+    <option value="date_join">Спочатку старіші</option>
+    <option value="-wage">Спочатку найбільша зарплата</option>
+    <option value="wage">Спочатку найменша зарплата</option>
   </select>
 </div>{% else %}
 <div class="signed-block row">
