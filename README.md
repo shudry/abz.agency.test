@@ -1,13 +1,12 @@
-# Це тестовий проект для abz.agency на позицію Junior Python Developer
+# Це тестовий проект для abz.agency на позицію Junior Python Developer [Працююча версія](http://91.231.84.101)
 
 ## Виконайте:
 ```bash 
 $ mkdir shudry-test-project && cd shudry-test-project 
 ```
 
-## Налаштування MySQL
+## Налаштування MySQL(5.7)
 ```bash
-$ sudo apt install mysql-server mysql-client libmysqlclient-dev
 $ mysql -u root -p
 ```
 ```sql 
@@ -17,9 +16,9 @@ GRANT ALL PRIVILEGES ON abzagencydatabase.* TO "django"@"localhost";
 FLUSH PRIVILEGES; 
 ```
 
-## Віртуальне оточення (Python >=3.5)
+## Віртуальне оточення (Python 3)
 ```bash
-$ virtualenv --no-site-packages -p python3.5 .virtual && source .virtual/bin/activate 
+$ virtualenv --no-site-packages -p python3 .virtual && source .virtual/bin/activate 
 ```
 
 ## Налаштування проекту:
