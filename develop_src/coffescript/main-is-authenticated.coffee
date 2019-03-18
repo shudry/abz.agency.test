@@ -1,10 +1,12 @@
 $ = jQuery
 
+# ___________________________ AJAXEmployeesManager ___________________________ CLASS __
+# -------------------------------------------------------------------------------------
 class AJAXEmployeesManager
 
     shownFirstWorkersId = {}
 
-    constructor: (@firstCount, @secondCount) ->
+    constructor: (@firstCount, @secondCount, @managerPopUp) ->
 
     getEmployee: (url, requestDone) ->
         thisContext = this
@@ -24,11 +26,12 @@ class AJAXEmployeesManager
         return l.pathname + l.search
 
 
-    appendElementToDOM = (element, id) ->
-        id_element = if id then "employee-#{id}-#{element.id}" else "employee-id-#{element.id}"
+    appendElementToDOM: (container, element, id) ->
+        thisContext = this
+        idElement = if id then "employee-#{id}-#{element.id}" else "employee-id-#{element.id}"
         html = """
-            <div class="employee" id="#{id_element}">
-                <div class="row">
+            <div class="employee" id="#{idElement}">
+                <div class="row" id="#{element.id}">
                     <div class="col-md-1 employee-image"><i class="fas fa-user-tie fa-2x"></i></div>
                     <div class="col-md-3">
                       <p>#{element.name}</p>
@@ -48,6 +51,10 @@ class AJAXEmployeesManager
                 </div>
             </div>
         """
+        $(container).append html
+        $("##{idElement} > .row").click (e) ->
+            thisContext.managerPopUp.show e.currentTarget.id
+
 
     appendElementLoadMore = (element_chief) ->
         html = """
@@ -86,13 +93,13 @@ class AJAXEmployeesManager
                             self: element,
                             subordinates: {}
                         }
-                        $(".container-workers").append(appendElementToDOM element)
+                        thisContext.appendElementToDOM ".container-workers", element
                     
                         #Initialization show subordinates(second hierarchy)
                         thisContext.showSecondHierarchy element.id, null, thisContext.secondCount                
                 else
                     # Show search results
-                    $(".container-workers").append(appendElementToDOM element, "search-result")
+                    thisContext.appendElementToDOM ".container-workers", element, "search-result" 
                     #thisContext.showSecondHierarchy element.id, null, thisContext.secondCount
 
             if data.next
@@ -115,9 +122,9 @@ class AJAXEmployeesManager
                 if doUseGlobalArray
                     if not shownFirstWorkersId[employee.chief].subordinates[employee.id]
                         shownFirstWorkersId[employee.chief].subordinates[employee.id] = employee
-                        $("#employee-id-#{employee.chief}").append(appendElementToDOM employee)
+                        thisContext.appendElementToDOM "#employee-id-#{employee.chief}", employee
                 else
-                    $("#employee-id-#{elementID}").append(appendElementToDOM employee)
+                    thisContext.appendElementToDOM "#employee-id-#{elementID}", employee
 
             if data.next
                 $("#employee-id-#{elementID}").append(appendElementLoadMore elementID)
@@ -173,18 +180,170 @@ class AJAXEmployeesManager
 
         shownFirstWorkersId = {}
 
-    showEmployees: () ->
+    initEmployees: () ->
         @showFirstHierarchy @firstCount
 
     getListWorkers: () ->
         return shownFirstWorkersId
 
 
+# ___________________________ PopUpWindowManager _____________________________ CLASS __
+# -------------------------------------------------------------------------------------
+class PopUpWindowManager
 
+    mainContainer = "#pop-up-container"
+    closePopUpArea = "#{mainContainer} #backgroud-close-block"
+
+    errorBlock = "#{mainContainer} #error-pop-up-block"
+    employeeBlock = "#{mainContainer} #info-employee"
+    chiefBlock = "#{mainContainer} #info-chief-employee"
+    employeesTreeBlock = "#{mainContainer} #tree-view-employees"
+
+    paddingColEmployee = "#{employeeBlock} > .padding-col-employee"
+
+
+    constructor: () ->
+        thisContext = this
+        $(closePopUpArea).click () ->
+            # If clicked on the background of the popup
+            thisContext.hide()
+
+
+    hide: () ->
+        $(mainContainer).css display: "none"
+        $(employeeBlock).css display: "none"
+        $(chiefBlock).css display: "none"
+        $(employeesTreeBlock).css display: "none"
+        $(errorBlock).css display: "none"
+
+
+    show: (employeeId) ->
+        thisContext = this
+        request = $.ajax 
+            url: "/employee/#{employeeId}/"
+            type: "GET"
+
+        request.done (data, textStatus, jqXHR) ->
+            $(mainContainer).css display: "block"
+
+            if jqXHR.status == 200
+                #show employee
+                thisContext._showEmployee(data)
+                thisContext._showEmployeesTree data.id
+                
+                if data.chief
+                    thisContext._showChief(data.chief)
+                    $(paddingColEmployee).css display: "block"
+                else
+                    # Hide padding employee
+                    $(paddingColEmployee).css display: "none"
+            else
+                #show error
+
+        request.fail (jqXHR, textStatus, errorThrown) ->
+            #error request AJAX
+            #console.log errorThrown
+            $(mainContainer).css display: "block"
+            thisContext.showError()
+
+
+    showError: (textError="Виникла помилка. Спробуйте ще раз") ->
+        element = $(errorBlock)
+        element.find("p").text(textError)
+        element.css display:"flex"
+
+
+    _showEmployee: (data) ->
+        element = $(employeeBlock)
+        element.css display: "flex"
+        @_appendData element, data
+
+
+    _showChief: (employeeId) ->
+        thisContext = this
+        request = $.ajax 
+            url: "/employee/#{employeeId}/"
+            type: "GET"
+
+        request.done (data, textStatus, jqXHR) ->
+            if jqXHR.status == 200
+                element = $(chiefBlock)
+                element.css display: "flex"
+                thisContext._appendData element, data
+
+        request.fail (jqXHR, textStatus, errorThrown) ->
+            #error request AJAX
+            thisContext.showError "Не вдалося завантажити начальника робітника."
+
+
+    _showEmployeesTree: (employeeId) ->
+        thisContext = this
+        request = $.ajax 
+            url: "/employee/#{employeeId}/get_tree/"
+            type: "GET"
+
+        request.done (data, textStatus, jqXHR) ->
+            if jqXHR.status == 200 and data.employee
+
+                containerTree = $("#{employeesTreeBlock} #tree-detail-container")
+
+                preDomTreeHtml = ""
+                firstCall = true
+
+                getEmpTree = (employeeData) ->
+                    if employeeData.self
+                        if employeeData.self.subordinate_count >= 1
+                            if firstCall
+                                pCS = "<li><a>#{employeeData.self.subordinate_count}</a></li>"
+                            else
+                                if employeeData.self.subordinate_count > 1
+                                    pCS = "<li><a>Та ще #{employeeData.self.subordinate_count - 1}</a></li>"
+                                else
+                                    pCS = ""
+                        else
+                            pCS = ""
+
+                        firstCall = false
+
+                        ulAppend = if preDomTreeHtml == "" and pCS == "" then "" else """
+                                <ul>
+                                    #{preDomTreeHtml}
+                                    #{pCS}
+                                </ul>
+                            """
+
+                        preDomTreeHtml = """
+                            <li>
+                                <a>#{employeeData.self.name}</a>
+                                #{ulAppend}
+                            </li>
+                            """
+
+                    if employeeData.employee
+                        getEmpTree employeeData.employee
+
+                getEmpTree data
+                containerTree.html "<ul>#{preDomTreeHtml}</ul>"
+
+                element = $(employeesTreeBlock)
+                element.css display: "flex"
+
+
+    _appendData: (element, data) ->
+        element.find("h4").text(data.name)
+        element.find("h6").text(data.work_position)
+        element.find("p").text(data.date_join)
+        element.find("h3").text(data.wage)
+
+
+
+# _________________________________ MAIN _____________________________________ EVENTS __
+# --------------------------------------------------------------------------------------
 
 $(document).ready ->
-    managerEmployees = new AJAXEmployeesManager 40, 10
-    managerEmployees.showEmployees()
+    managerPopUp = new PopUpWindowManager
+    managerEmployees = new AJAXEmployeesManager 40, 10, managerPopUp
+    managerEmployees.initEmployees()
 
 
     delay = (callback, ms=800) ->
@@ -286,7 +445,12 @@ $(document).ready ->
 
         managerEmployees.clearContainer()
         managerEmployees.removeEmployees()
-        managerEmployees.showEmployees()
+        managerEmployees.initEmployees()
+
+
+
+
+
 
 
     $('#search-by-name-field').keyup delay functionSearchBy #Search by name

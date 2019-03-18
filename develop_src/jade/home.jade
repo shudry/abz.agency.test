@@ -77,7 +77,7 @@
     input(type="text", placeholder="( work1 | work2 | ... )").form-control#search-by-work-position-field
 
     label(for="search-by-wage-field") Пошук по заробітній платі:
-    input(type="text", placeholder="( wage1 | wage2 | ... )").form-control#search-by-wage-field
+    input(type="text", placeholder="( wage1 - wage2 | wage3 )").form-control#search-by-wage-field
 
     select.custom-select#select-sorted-by
         option(value="?", selected) Сортувати ...
@@ -105,3 +105,49 @@
                 button(type="submit").btn.btn-default Відправити
 {% endif %}
 {% endblock right_panel %}
+
+
+
+
+
+{% block additional_body %}
+
+.container-fluid#pop-up-container
+    #backgroud-close-block
+
+    .row.justify-content-md-center
+        .col-md-8#block-in-pop-up
+            .row#info-chief-employee
+                .col-md-3.text-center
+                    i.fas.fa-user-tie.fa-4x
+                .col-md-9
+                    h4 Employee name
+                    h6 Work position
+                    p Date join
+                    h3 Wage
+
+            .row.justify-content-md-center#error-pop-up-block
+                .col-lg-8.col-md-10
+                    div(role="alert").row.alert.alert-danger.text-center 
+                        .col-md-1
+                            i.fas.fa-exclamation-triangle.fa-2x
+                        .col-md-11
+                            p Error message
+                            br
+                            b
+                            
+            .row#info-employee
+                .col-md-1.padding-col-employee
+                .col-md-3.text-center
+                    i.fas.fa-user-tie.fa-4x
+                .col-md-8
+                    h4 Employee name
+                    h6 Work position
+                    p Date join
+                    h3 Wage
+
+            .row.justify-content-md-center#tree-view-employees
+                .col-md-auto
+                    div#tree-detail-container
+
+{% endblock additional_body %}

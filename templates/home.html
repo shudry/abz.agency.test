@@ -76,7 +76,7 @@
   <label for="search-by-work-position-field">Пошук за посадою:</label>
   <input type="text" placeholder="( work1 | work2 | ... )" id="search-by-work-position-field" class="form-control"/>
   <label for="search-by-wage-field">Пошук по заробітній платі:</label>
-  <input type="text" placeholder="( wage1 | wage2 | ... )" id="search-by-wage-field" class="form-control"/>
+  <input type="text" placeholder="( wage1 - wage2 | wage3 )" id="search-by-wage-field" class="form-control"/>
   <select id="select-sorted-by" class="custom-select">
     <option value="?" selected="selected">Сортувати ...</option>
     <option value="name">За алфавітом</option>
@@ -107,3 +107,45 @@
   </form>
 </div>{% endif %}
 {% endblock right_panel %}
+{% block additional_body %}
+<div id="pop-up-container" class="container-fluid">
+  <div id="backgroud-close-block"></div>
+  <div class="row justify-content-md-center">
+    <div id="block-in-pop-up" class="col-md-8">
+      <div id="info-chief-employee" class="row">
+        <div class="col-md-3 text-center"><i class="fas fa-user-tie fa-4x"></i></div>
+        <div class="col-md-9">
+          <h4>Employee name</h4>
+          <h6>Work position</h6>
+          <p>Date join</p>
+          <h3>Wage</h3>
+        </div>
+      </div>
+      <div id="error-pop-up-block" class="row justify-content-md-center">
+        <div class="col-lg-8 col-md-10">
+          <div role="alert" class="row alert alert-danger text-center"> 
+            <div class="col-md-1"><i class="fas fa-exclamation-triangle fa-2x"></i></div>
+            <div class="col-md-11">
+              <p>Error message</p><br/><b></b>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="info-employee" class="row">
+        <div class="col-md-1 padding-col-employee"></div>
+        <div class="col-md-3 text-center"><i class="fas fa-user-tie fa-4x"></i></div>
+        <div class="col-md-8">
+          <h4>Employee name</h4>
+          <h6>Work position</h6>
+          <p>Date join</p>
+          <h3>Wage</h3>
+        </div>
+      </div>
+      <div id="tree-view-employees" class="row justify-content-md-center">
+        <div class="col-md-auto">
+          <div id="tree-detail-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>{% endblock additional_body %}

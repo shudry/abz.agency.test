@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -82,6 +83,38 @@ class RestEmployee(viewsets.ModelViewSet):
             recent_employees = self.sorted(request, recent_employees, sorted_by) 
 
         return self._response_paginated_queryset(recent_employees)
+
+
+    @action(detail=True, methods=['get'])
+    def get_tree(self, request, pk=None):
+        """ Get tree employees for detail pop-up """
+
+        employee = self.get_object()
+        return Response(self._get_employee_chief_recursive(employee.id))
+
+
+    def _get_employee_chief_recursive(self, employee_id):
+        try:
+            employee = self.get_queryset().get(id=employee_id)
+        except ObjectDoesNotExist:
+            return {'employee': None}
+
+        predict = {
+            'employee': {
+                'self': {
+                    'id': employee.id,
+                    'name': employee.name,
+                    'subordinate_count': self.get_queryset().filter(chief_id=employee.id).count()
+                }
+            }
+        }
+
+        if not employee.chief:
+            return predict
+        else:
+            predict2 = self._get_employee_chief_recursive(employee.chief.id)
+            predict['employee'].update(predict2)
+            return predict
 
 
     @action(detail=False, methods=['get'])
